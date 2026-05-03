@@ -1,0 +1,11 @@
+.dashboard {
+  padding: 2rem;
+}
+.dashboard h1 {
+  margin: 0 0 1rem;
+}
+
+.welcome_user {
+  font-weight: 300;
+  font-size: 4rem;
+}

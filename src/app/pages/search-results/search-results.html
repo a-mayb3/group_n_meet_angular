@@ -1,0 +1,48 @@
+<div class="search-results-page">
+  <form (ngSubmit)="onSubmit()" class="search-form">
+    <input name="name" [(ngModel)]="name" placeholder="Event name" aria-label="Event name" />
+    <input
+      name="organizer_group_name"
+      [(ngModel)]="organizer_group_name"
+      placeholder="Organizer group"
+      aria-label="Organizer group"
+    />
+    <input name="place" [(ngModel)]="place" placeholder="Place" aria-label="Place" />
+
+    <label>
+      Start from
+      <input type="datetime-local" name="start_time_from" [(ngModel)]="start_time_from" />
+    </label>
+    <label>
+      Start to
+      <input type="datetime-local" name="start_time_to" [(ngModel)]="start_time_to" />
+    </label>
+
+    <label>
+      End from
+      <input type="datetime-local" name="end_time_from" [(ngModel)]="end_time_from" />
+    </label>
+    <label>
+      End to
+      <input type="datetime-local" name="end_time_to" [(ngModel)]="end_time_to" />
+    </label>
+
+    <button type="submit">Search</button>
+  </form>
+
+  <div *ngIf="loading" class="loading">Loading...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <ul *ngIf="results.length" class="results-list">
+    <li *ngFor="let r of results" class="result-item">
+      <h3>{{ r.title ?? r.name ?? r.event_title ?? 'Untitled Event' }}</h3>
+      <p *ngIf="r.description || r.summary">{{ r.description ?? r.summary }}</p>
+      <div class="meta">
+        <small *ngIf="r.starts_at">Starts: {{ r.starts_at }}</small>
+        <small *ngIf="r.location"> • {{ r.location }}</small>
+      </div>
+    </li>
+  </ul>
+
+  <div *ngIf="!loading && !results.length && !error" class="empty">No results</div>
+</div>
