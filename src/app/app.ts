@@ -1,12 +1,23 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterOutlet, Router, Event } from '@angular/router';
+
+import { Footer } from './footer/footer';
+import { Navbar } from './navbar/navbar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, Navbar, Footer],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css'],
 })
 export class App {
-  protected readonly title = signal('group_n_meet_angular_');
+  constructor(private router: Router) {
+    // Log router events to help debug unexpected redirects
+    this.router.events.subscribe((e: Event) => {
+      // Use console.group to make the logs easier to scan
+      // eslint-disable-next-line no-console
+      console.log('[ROUTER EVENT]', e);
+    });
+  }
 }

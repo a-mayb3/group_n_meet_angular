@@ -1,6 +1,7 @@
 footer {
   margin: 0;
-  
+  margin-top: .5rem;
+
   min-height: 5rem;
   height: min-content;
   width: 100%;
