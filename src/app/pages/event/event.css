@@ -1,0 +1,17 @@
+.event-page {
+  padding: 1rem;
+}
+.event-title {
+  margin: 0 0 0.5rem 0;
+}
+.event-meta {
+  color: #666;
+  margin-bottom: 1rem;
+}
+.event-description {
+  margin-bottom: 1rem;
+}
+.event-actions a {
+  color: #0066cc;
+  text-decoration: none;
+}

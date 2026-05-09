@@ -1,0 +1,40 @@
+<div class="event-page">
+  <div *ngIf="loading" class="loading">Loading event…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <article *ngIf="!loading && event" class="event-detail">
+    <h1 class="event-title">
+      {{ event.title ?? event.name ?? event.event_title ?? 'Untitled Event' }}
+    </h1>
+
+    <p class="event-meta">
+      <small *ngIf="event.starts_at || event.start_time"
+        >Starts: {{ event.starts_at ?? event.start_time }}</small
+      >
+      <small *ngIf="event.location"> • {{ event.location }}</small>
+      <small *ngIf="event.organizer || event.organizer_group_name">
+        • {{ event.organizer?.name ?? event.organizer_group_name }}</small
+      >
+    </p>
+
+    <div *ngIf="event.description" class="event-description">{{ event.description }}</div>
+
+    <div class="event-actions">
+      <a routerLink="/search">← Back to search</a>
+    </div>
+  </article>
+
+  <section class="debug" *ngIf="lastAttemptedEndpoint || lastError || lastResponse">
+    <h3>Debug</h3>
+    <p><strong>Last endpoint:</strong> {{ lastAttemptedEndpoint }}</p>
+    <p *ngIf="navStateUsed"><strong>Used navigation state</strong></p>
+    <div *ngIf="lastResponse">
+      <strong>Last response:</strong>
+      <pre>{{ lastResponse | json }}</pre>
+    </div>
+    <div *ngIf="lastError">
+      <strong>Last error:</strong>
+      <pre>{{ lastError | json }}</pre>
+    </div>
+  </section>
+</div>

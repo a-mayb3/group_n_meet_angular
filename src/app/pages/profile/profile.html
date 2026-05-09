@@ -1,0 +1,40 @@
+<div class="profile-page">
+  <div *ngIf="loading" class="loading">Loading profile…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <section *ngIf="!loading && profile" class="profile-detail">
+    <h1 class="profile-name">
+      {{ profile.display_name ?? profile.name ?? profile.email_address ?? 'User' }}
+    </h1>
+
+    <p class="profile-meta">
+      <small *ngIf="profile.email_address || profile.email"
+        >Email: {{ profile.email_address ?? profile.email }}</small
+      >
+      <small *ngIf="profile.user_type"> • {{ profile.user_type }}</small>
+      <small *ngIf="profile.created"> • Joined: {{ profile.created }}</small>
+    </p>
+
+    <div *ngIf="profile.bio || profile.description" class="profile-bio">
+      {{ profile.bio ?? profile.description }}
+    </div>
+
+    <div class="profile-actions">
+      <a routerLink="/search">← Back to search</a>
+    </div>
+  </section>
+
+  <section class="debug" *ngIf="lastAttemptedEndpoint || lastError || lastResponse">
+    <h3>Debug</h3>
+    <p><strong>Last endpoint:</strong> {{ lastAttemptedEndpoint }}</p>
+    <p *ngIf="navStateUsed"><strong>Used navigation state</strong></p>
+    <div *ngIf="lastResponse">
+      <strong>Last response:</strong>
+      <pre>{{ lastResponse | json }}</pre>
+    </div>
+    <div *ngIf="lastError">
+      <strong>Last error:</strong>
+      <pre>{{ lastError | json }}</pre>
+    </div>
+  </section>
+</div>

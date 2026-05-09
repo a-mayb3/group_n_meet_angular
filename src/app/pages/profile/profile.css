@@ -1,0 +1,23 @@
+.profile-page {
+  padding: 1rem;
+}
+.profile-name {
+  margin: 0 0 0.5rem 0;
+}
+.profile-meta {
+  color: #666;
+  margin-bottom: 1rem;
+}
+.profile-bio {
+  margin-bottom: 1rem;
+}
+.profile-actions a {
+  color: #0066cc;
+  text-decoration: none;
+}
+.debug pre {
+  max-height: 240px;
+  overflow: auto;
+  background: #f8f8f8;
+  padding: 0.5rem;
+}
