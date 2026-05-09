@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { timeout, take } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserBase } from '../../models/user.model';
@@ -17,10 +18,23 @@ export class DashboardComponent implements OnInit {
   loading = false;
   error = '';
 
-  constructor(private api: ApiService, private auth: AuthService) {}
+  constructor(
+    private api: ApiService,
+    private auth: AuthService,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.loading = true;
+
+    // If resolver provided dashboard user, use it immediately
+    const resolved =
+      (this.route.snapshot && (this.route.snapshot.data as any)?.['dashboardUser']) ?? null;
+    if (resolved) {
+      this.user = resolved;
+      this.loading = false;
+      return;
+    }
 
     // First check if AuthService already has a user (from APP_INITIALIZER or earlier login)
     this.auth.currentUser$.pipe(take(1)).subscribe((user) => {
@@ -37,6 +51,14 @@ export class DashboardComponent implements OnInit {
     this.auth.currentUser$.subscribe((user) => {
       if (user) {
         this.user = user;
+        this.loading = false;
+      }
+    });
+
+    // Also listen for resolver updates (future navigations)
+    this.route.data.subscribe((data) => {
+      if (data && data['dashboardUser']) {
+        this.user = data['dashboardUser'];
         this.loading = false;
       }
     });
