@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
+import { EventResultCard } from '../../event-result-card/event-result-card';
 
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EventResultCard],
   templateUrl: './search-results.html',
   styleUrls: ['./search-results.css'],
 })
@@ -25,10 +26,36 @@ export class SearchResultsComponent implements OnInit {
   loading = false;
   error = '';
 
-  constructor(private api: ApiService, private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private api: ApiService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
+    // If resolver provided results, use them first and skip the initial queryParamMap trigger
+    let skipFirstQueryParam = false;
+    const resolved =
+      (this.route.snapshot && (this.route.snapshot.data as any)?.['searchResults']) ?? null;
+    if (resolved && Array.isArray(resolved)) {
+      this.results = resolved;
+      this.loading = false;
+      skipFirstQueryParam = true;
+    }
+
+    // Also listen to route.data for future resolver-provided results
+    this.route.data.subscribe((data) => {
+      if (data && data['searchResults']) {
+        this.results = data['searchResults'];
+        this.loading = false;
+      }
+    });
+
     this.route.queryParamMap.subscribe((params) => {
+      if (skipFirstQueryParam) {
+        skipFirstQueryParam = false;
+        return;
+      }
       this.name = params.get('name') ?? '';
       this.organizer_group_name = params.get('organizer_group_name') ?? '';
       this.place = params.get('place') ?? '';
@@ -56,7 +83,8 @@ export class SearchResultsComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.router.navigate(['/search'], { queryParams: this.buildParams() });
+    const params = this.buildParams();
+    this.router.navigate(['/search'], { queryParams: params });
   }
 
   private buildParams(): { [key: string]: string } {
@@ -64,7 +92,8 @@ export class SearchResultsComponent implements OnInit {
     if (this.name) params['name'] = this.name;
     if (this.organizer_group_name) params['organizer_group_name'] = this.organizer_group_name;
     if (this.place) params['place'] = this.place;
-    if (this.start_time_from) params['start_time_from'] = this.formatLocalDateTime(this.start_time_from);
+    if (this.start_time_from)
+      params['start_time_from'] = this.formatLocalDateTime(this.start_time_from);
     if (this.start_time_to) params['start_time_to'] = this.formatLocalDateTime(this.start_time_to);
     if (this.end_time_from) params['end_time_from'] = this.formatLocalDateTime(this.end_time_from);
     if (this.end_time_to) params['end_time_to'] = this.formatLocalDateTime(this.end_time_to);

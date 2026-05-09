@@ -1,14 +1,42 @@
 .search-results-page {
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
+
+.search-form-container {
+  margin: 0;
+  padding: 1rem 0;
+
+  width: 100%;
+  
+  display: flex;
+  flex: column;
+  justify-content: center;
+
+  border: 1px solid black;
+}
+
 .search-form {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  width: 100%;
+  max-width: 900px;
+  justify-content: center;
+  justify-self: center;
+  flex-wrap: wrap;
 }
 .search-form input {
-  flex: 1 1 auto;
+  flex: 1 1 180px;
   padding: 0.5rem;
+  min-width: 140px;
+}
+
+.search-form button {
+  padding: 0.5rem 0.8rem;
 }
 .results-list {
   list-style: none;
