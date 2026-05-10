@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { Observable } from 'rxjs';
+import { buildSearchParams } from '../utils/search-params';
 
 @Component({
   selector: 'app-navbar',
@@ -27,9 +28,7 @@ export class Navbar {
   }
 
   onSubmit(): void {
-    const params: { [key: string]: string } = {};
-    if (this.name) params['name'] = this.name;
-    if (this.place) params['place'] = this.place;
+    const params = buildSearchParams({ name: this.name, place: this.place });
     this.router.navigate(['/search'], { queryParams: params });
   }
 }
