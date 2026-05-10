@@ -1,0 +1,17 @@
+.group-page {
+  padding: 1rem;
+}
+.group-name {
+  margin: 0 0 0.5rem 0;
+}
+.group-meta {
+  color: #666;
+  margin-bottom: 1rem;
+}
+.group-description {
+  margin-bottom: 1rem;
+}
+.loading,
+.error {
+  margin: 0.5rem 0;
+}

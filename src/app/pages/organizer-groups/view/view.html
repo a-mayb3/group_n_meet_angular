@@ -1,0 +1,28 @@
+<div class="group-page">
+  <div *ngIf="loading" class="loading">Loading organizer group…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <section *ngIf="!loading && group" class="group-detail">
+    <h1 class="group-name">{{ group.display_name ?? group.name ?? 'Organizer Group' }}</h1>
+
+    <p class="group-meta">
+      <small *ngIf="group.id">ID: {{ group.id }}</small>
+      <small *ngIf="group.created"> • Created: {{ group.created }}</small>
+    </p>
+
+    <div *ngIf="group.description" class="group-description">{{ group.description }}</div>
+
+    <section class="group-events">
+      <h2>Events by this organizer</h2>
+
+      <div *ngIf="eventsLoading" class="loading">Loading events…</div>
+      <div *ngIf="eventsError" class="error">{{ eventsError }}</div>
+
+      <div *ngIf="events && events.length" class="results-list">
+        <app-event-result-card *ngFor="let e of events" [event]="e"></app-event-result-card>
+      </div>
+
+      <div *ngIf="!eventsLoading && !events.length" class="empty">No events</div>
+    </section>
+  </section>
+</div>
