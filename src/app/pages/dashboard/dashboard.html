@@ -1,10 +1,25 @@
 <div class="dashboard">
-
   <div *ngIf="loading">Loading user info…</div>
 
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <div *ngIf="user">
-    <h1 class="welcome_user"> Welcome, <i>{{ user.display_name }}!</i></h1>
+    <h1 class="welcome_user">
+      Welcome, <i>{{ user.display_name }}!</i>
+    </h1>
   </div>
+
+  <section>
+    <h2>Your RSVPs</h2>
+    <div *ngIf="rsvpsLoading">Loading your RSVPs…</div>
+    <div *ngIf="rsvpsError" class="error">{{ rsvpsError }}</div>
+    <div *ngIf="rsvps && rsvps.length; else noRsvps">
+      <div class="rsvp-list">
+        <app-rsvp-card *ngFor="let rsvp of rsvps" [rsvp]="rsvp"></app-rsvp-card>
+      </div>
+    </div>
+  </section>
+  <ng-template #noRsvps>
+    <div>No RSVPs found</div>
+  </ng-template>
 </div>
