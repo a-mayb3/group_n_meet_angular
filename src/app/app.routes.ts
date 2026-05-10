@@ -8,6 +8,7 @@ import { SearchResolver } from './resolvers/search.resolver';
 import { DashboardResolver } from './resolvers/dashboard.resolver';
 import { EventResolver } from './resolvers/event.resolver';
 import { ProfileResolver } from './resolvers/profile.resolver';
+import { RsvpsResolver } from './resolvers/rsvps.resolver';
 import { ProfilePageComponent } from './pages/profile/profile';
 
 export const routes: Routes = [
@@ -20,12 +21,12 @@ export const routes: Routes = [
     path: 'dashboard',
     component: DashboardComponent,
     canActivate: [AuthGuard],
-    resolve: { dashboardUser: DashboardResolver },
+    resolve: { dashboardUser: DashboardResolver, rsvps: RsvpsResolver },
   },
   {
     path: '',
     component: DashboardComponent,
     canActivate: [AuthGuard],
-    resolve: { dashboardUser: DashboardResolver },
+    resolve: { dashboardUser: DashboardResolver, rsvps: RsvpsResolver },
   },
 ];

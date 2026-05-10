@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
+import { from, of } from 'rxjs';
+import { concatMap, map, catchError, filter, take, defaultIfEmpty } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
+import { GroupResolver } from '../../resolvers/group.resolver';
 
 @Component({
   selector: 'app-event-page',
@@ -24,6 +27,7 @@ export class EventPageComponent implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private router: Router,
+    private groupResolver: GroupResolver,
   ) {}
 
   ngOnInit(): void {
@@ -62,92 +66,89 @@ export class EventPageComponent implements OnInit {
   private loadEvent(id: string): void {
     this.loading = true;
     this.error = '';
-    const attempt = (endpoint: string, onError: () => void) => {
-      this.lastAttemptedEndpoint = endpoint;
-      // eslint-disable-next-line no-console
-      console.log('Requesting event from', endpoint);
-      this.api
-        .get<any>(endpoint)
-        .pipe(timeout(10000))
-        .subscribe({
-          next: (resp) => {
-            // eslint-disable-next-line no-console
-            console.log('Response for', endpoint, resp);
-            this.lastResponse = resp;
-            this.lastError = null;
-            const payload = (resp as any)?.data ?? resp;
-            if (Array.isArray(payload)) {
-              this.event = payload[0] ?? null;
-            } else {
-              this.event = payload ?? null;
-            }
-            this.loading = false;
-          },
-          error: (err) => {
-            // try fallback if provided
-            // eslint-disable-next-line no-console
-            console.warn('Request failed for', endpoint, err?.status, err);
-            this.lastError = {
-              status: err?.status,
-              message: err?.message || err?.error?.message,
-              body: err?.error ?? err,
-            };
-            onError();
-          },
-        });
-    };
+    const endpoints = [`/events/${id}`, `/events/${id}/`, `/event/${id}`, `/event/${id}/`];
 
-    // Try several possible endpoint shapes, then fall back to search
-    attempt(`/events/${id}`, () => {
-      attempt(`/events/${id}/`, () => {
-        attempt(`/event/${id}`, () => {
-          attempt(`/event/${id}/`, () => {
-            // as a last-ditch attempt, try searching by id via search endpoint
-            this.lastAttemptedEndpoint = `/events/search?id=${id}`;
-            this.api
-              .get<any>('/events/search', { id })
-              .pipe(timeout(10000))
-              .subscribe({
-                next: (resp) => {
-                  this.lastResponse = resp;
-                  const payload = (resp as any)?.data ?? resp;
-                  if (Array.isArray(payload) && payload.length) {
-                    // find exact match by id or pk or _id or slug
-                    const found = (payload as any[]).find((e) =>
-                      [e.id, e.pk, e._id, e.slug]?.some((x: any) => String(x) === String(id)),
-                    );
-                    this.event = found ?? payload[0];
-                  } else if (payload && typeof payload === 'object') {
-                    // payload might be an object with results/items
-                    const list = payload.results ?? payload.items ?? [];
-                    if (Array.isArray(list) && list.length) {
-                      const found = list.find((e: any) =>
-                        [e.id, e.pk, e._id, e.slug]?.some((x: any) => String(x) === String(id)),
-                      );
-                      this.event = found ?? list[0];
-                    } else {
-                      this.event = null;
-                    }
-                  } else {
-                    this.event = null;
-                  }
-                  this.loading = false;
-                },
-                error: (err) => {
-                  // eslint-disable-next-line no-console
-                  console.error('Failed to load event via search fallback', err);
-                  this.lastError = {
-                    status: err?.status,
-                    message: err?.message || err?.error?.message,
-                    body: err?.error ?? err,
-                  };
-                  this.error = err?.error?.message || 'Failed to load event';
-                  this.loading = false;
-                },
-              });
-          });
-        });
-      });
+    const tryEndpoints$ = from(endpoints).pipe(
+      concatMap((ep) =>
+        this.api.get<any>(ep).pipe(
+          timeout(10000),
+          map((resp) => (resp as any)?.data ?? resp),
+          catchError(() => of(null)),
+        ),
+      ),
+      filter((x) => x != null),
+      take(1),
+      defaultIfEmpty(null),
+    );
+
+    tryEndpoints$.subscribe({
+      next: (payload) => {
+        if (!payload) {
+          this.event = null;
+          this.loading = false;
+          this.error = `Event ${id} not found`;
+          return;
+        }
+
+        const payloadObj = Array.isArray(payload) ? (payload[0] ?? null) : (payload ?? null);
+        this.event = payloadObj;
+        this.loading = false;
+        if (this.event) this.resolveOrganizerNameIfNeeded(this.event);
+      },
+      error: (err) => {
+        console.warn('Event lookup failed', err?.status, err);
+        this.loading = false;
+      },
     });
+  }
+
+  private resolveOrganizerNameIfNeeded(eventObj: any): void {
+    if (!eventObj) return;
+    // If the organizer name is already present, nothing to do
+    if (eventObj.organizer_group_name) return;
+
+    // Handle nested group object cases
+    const nested = eventObj.organizer_group ?? eventObj.group ?? eventObj.organizer;
+    if (nested && typeof nested === 'object') {
+      const name =
+        nested.name ?? nested.title ?? nested.display_name ?? nested.group_name ?? nested.full_name;
+      if (name) {
+        eventObj.organizer_group_name = name;
+        this.lastResponse = eventObj;
+        return;
+      }
+    }
+
+    const gid =
+      eventObj.organizer_group_id ??
+      eventObj.organizer_group ??
+      eventObj.group_id ??
+      eventObj.organizer_id ??
+      null;
+    if (!gid) return;
+
+    this.groupResolver
+      .resolveById(String(gid))
+      .pipe(
+        timeout(10000),
+        catchError(() => of(null)),
+      )
+      .subscribe({
+        next: (gp) => {
+          const gObj = Array.isArray(gp) ? gp[0] : gp;
+          const name =
+            gObj?.name ??
+            gObj?.title ??
+            gObj?.display_name ??
+            gObj?.group_name ??
+            gObj?.full_name ??
+            null;
+          if (name) {
+            eventObj.organizer_group_name = name;
+            this.lastResponse = eventObj;
+          }
+        },
+        error: () => {},
+      });
   }
 }

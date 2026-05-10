@@ -1,12 +1,17 @@
 .event-page {
-  padding: 1rem;
+  padding: 0rem 3rem;
 }
 .event-title {
-  margin: 0 0 0.5rem 0;
+  width: auto;
+  font-size: 3.5rem;
 }
 .event-meta {
   color: #666;
   margin-bottom: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 .event-description {
   margin-bottom: 1rem;
