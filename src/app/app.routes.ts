@@ -14,7 +14,7 @@ import { ProfilePageComponent } from './pages/profile/profile';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'signup', component: RegisterComponent },
+  { path: 'register', component: RegisterComponent },
   { path: 'search', component: SearchResultsComponent, resolve: { searchResults: SearchResolver } },
   { path: 'event/:id', component: EventPageComponent, resolve: { event: EventResolver } },
   { path: 'profile', component: ProfilePageComponent, resolve: { profile: ProfileResolver } },

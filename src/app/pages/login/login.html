@@ -46,19 +46,13 @@
       </div>
 
       <!-- Submit Button -->
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="loading"
-      >
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
         <span *ngIf="loading" class="spinner"></span>
         {{ loading ? 'Logging in...' : 'Login' }}
       </button>
     </form>
 
     <!-- Sign Up Link -->
-    <p class="signup-link">
-      Don't have an account? <a routerLink="/signup">Sign up</a>
-    </p>
+    <p class="signup-link">Don't have an account? <a routerLink="/register">Sign up</a></p>
   </div>
 </div>
