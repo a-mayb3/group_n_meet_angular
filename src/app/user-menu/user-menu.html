@@ -15,7 +15,10 @@
 </button>
 
 <div class="user-menu" *ngIf="showMenu" role="menu" aria-label="User menu">
-  <a class="menu-item" (click)="navigateToProfile()" role="menuitem">Profile</a>
-  <a class="menu-item" (click)="navigateToDashboard()" role="menuitem">Dashboard</a>
-  <a class="menu-item" (click)="logout()" role="menuitem">Logout</a>
+  <a class="menu-item" (click)="navigateToProfile()" role="menuitem">My profile</a>
+  <a class="menu-item" (click)="navigateToMyReservations()" role="menuitem">My reservations</a>
+  <a class="menu-item" (click)="navigateToMyOrganizerGroups()" role="menuitem">My organizer groups</a>
+  <a class="menu-item" (click)="navigateToAddEvent()" role="menuitem">Add event</a>
+  <a class="menu-item" (click)="navigateToAddOrganizerGroup()" role="menuitem">Add organizer group</a>
+  <a class="menu-item logout-button" (click)="logout()" role="menuitem">Logout</a>
 </div>

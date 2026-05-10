@@ -36,3 +36,13 @@
 .user-menu .menu-item:hover {
   background: #f7f7f7;
 }
+
+
+.logout-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+}

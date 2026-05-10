@@ -43,10 +43,13 @@ export class UserMenu {
     }
   }
 
-  navigateToDashboard(): void {
-    this.showMenu = false;
-    this.router.navigate(['/dashboard']);
-  }
+  // TODO: implement these methods
+
+  navigateToMyReservations(): void {}
+  navigateToMyOrganizerGroups(): void {}
+  navigateToAddEvent(): void {}
+  navigateToAddOrganizerGroup(): void {}
+
 
   logout(): void {
     this.auth.logout().subscribe({
