@@ -19,18 +19,4 @@
       {{ profile.bio ?? profile.description }}
     </div>
   </section>
-
-  <section class="debug" *ngIf="lastAttemptedEndpoint || lastError || lastResponse">
-    <h3>Debug</h3>
-    <p><strong>Last endpoint:</strong> {{ lastAttemptedEndpoint }}</p>
-    <p *ngIf="navStateUsed"><strong>Used navigation state</strong></p>
-    <div *ngIf="lastResponse">
-      <strong>Last response:</strong>
-      <pre>{{ lastResponse | json }}</pre>
-    </div>
-    <div *ngIf="lastError">
-      <strong>Last error:</strong>
-      <pre>{{ lastError | json }}</pre>
-    </div>
-  </section>
 </div>
