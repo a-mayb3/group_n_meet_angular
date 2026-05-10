@@ -119,12 +119,18 @@ export class EventPageComponent implements OnInit {
       }
     }
 
+    // Extract group ID from various possible fields
     const gid =
       eventObj.organizer_group_id ??
-      eventObj.organizer_group ??
+      (typeof eventObj.organizer_group === 'object'
+        ? (eventObj.organizer_group?.id ??
+          eventObj.organizer_group?.pk ??
+          eventObj.organizer_group?._id)
+        : null) ??
       eventObj.group_id ??
       eventObj.organizer_id ??
       null;
+
     if (!gid) return;
 
     this.groupResolver
@@ -145,10 +151,26 @@ export class EventPageComponent implements OnInit {
             null;
           if (name) {
             eventObj.organizer_group_name = name;
+            this.event = { ...eventObj };
             this.lastResponse = eventObj;
           }
         },
         error: () => {},
       });
+  }
+
+  navigateToOrganizerGroup(): void {
+    if (!this.event) return;
+    const gid =
+      this.event.organizer_group_id ??
+      this.event.organizer_group?.id ??
+      this.event.organizer_group?.pk ??
+      this.event.organizer_group?._id ??
+      this.event.group_id ??
+      this.event.organizer_id ??
+      null;
+    if (gid) {
+      this.router.navigate(['/org', String(gid)]);
+    }
   }
 }

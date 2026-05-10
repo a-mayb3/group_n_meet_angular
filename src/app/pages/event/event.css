@@ -20,3 +20,14 @@
   color: #0066cc;
   text-decoration: none;
 }
+
+.organizer-link {
+  color: #667eea;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.organizer-link:hover {
+  text-decoration: underline;
+}

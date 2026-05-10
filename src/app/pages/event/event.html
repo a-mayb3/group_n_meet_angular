@@ -1,7 +1,4 @@
 <div class="event-page">
-  <div class="event-actions">
-    <a routerLink="/search">Back to search</a>
-  </div>
 
   <div *ngIf="loading" class="loading">Loading event…</div>
   <div *ngIf="error" class="error">{{ error }}</div>
@@ -21,28 +18,14 @@
       </small>
 
       <small *ngIf="event.location"> Where: {{ event.location }} </small>
-      <small
-        *ngIf="
-          event.organizer_group_name ||
-          event.organizer_group?.name ||
-          event.organizer_group?.display_name ||
-          event.organizer_group?.displayName ||
-          event.organizer_group?.title ||
-          event.organizer_group?.group_name ||
-          event.organizer_group?.groupName
-        "
-      >
-        Organizer:
-        {{
-          event.organizer_group_name ??
-            event.organizer_group?.name ??
-            event.organizer_group?.display_name ??
-            event.organizer_group?.displayName ??
-            event.organizer_group?.title ??
-            event.organizer_group?.group_name ??
-            event.organizer_group?.groupName
-        }}
-      </small>
+      <div *ngIf="event && (event.organizer_group_name || event.organizer_group_id || event.group_id)" class="organizer-section">
+        <p>
+          <strong>Organizer Group:</strong>
+          <a class="organizer-link" (click)="navigateToOrganizerGroup()">
+            {{ event.organizer_group_name || event.organizer_group?.name || event.group?.name || 'View organizer group' }}
+          </a>
+        </p>
+      </div>
     </div>
   </article>
 </div>
