@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
-import { EventResultCard } from '../../event-result-card/event-result-card';
-import { buildSearchParams } from '../../utils/search-params';
+import { EventsList } from '../../events-list/events-list';
+import { buildSearchParams, formatLocalDateTime } from '../../utils/search-params';
 
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [CommonModule, FormsModule, EventResultCard],
+  imports: [CommonModule, FormsModule, EventsList],
   templateUrl: './search-results.html',
   styleUrls: ['./search-results.css'],
 })
@@ -34,80 +34,54 @@ export class SearchResultsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // If resolver provided results, use them first and skip the initial queryParamMap trigger
-    let skipFirstQueryParam = false;
-    const resolved =
-      (this.route.snapshot && (this.route.snapshot.data as any)?.['searchResults']) ?? null;
-    if (resolved && Array.isArray(resolved)) {
-      this.results = resolved;
-      this.loading = false;
-      skipFirstQueryParam = true;
+    const initialParams = this.route.snapshot.queryParamMap;
+    this.applyQueryParams(initialParams);
+
+    if (this.hasSearchTerms(initialParams)) {
+      this.performSearch(this.buildQueryParams());
     }
 
-    // Also listen to route.data for future resolver-provided results
-    this.route.data.subscribe((data) => {
-      if (data && data['searchResults']) {
-        this.results = data['searchResults'];
-        this.loading = false;
-      }
-    });
-
-    this.route.queryParamMap.subscribe((params) => {
-      if (skipFirstQueryParam) {
-        skipFirstQueryParam = false;
-        return;
-      }
-      this.name = params.get('name') ?? '';
-      this.organizer_group_name = params.get('organizer_group_name') ?? '';
-      this.place = params.get('place') ?? '';
-      this.start_time_from = params.get('start_time_from') ?? '';
-      this.start_time_to = params.get('start_time_to') ?? '';
-      this.end_time_from = params.get('end_time_from') ?? '';
-      this.end_time_to = params.get('end_time_to') ?? '';
-
-      const hasAny = [
-        this.name,
-        this.organizer_group_name,
-        this.place,
-        this.start_time_from,
-        this.start_time_to,
-        this.end_time_from,
-        this.end_time_to,
-      ].some((v) => !!v);
-
-      if (hasAny) {
-        this.performSearch(
-          buildSearchParams({
-            name: this.name,
-            organizer_group_name: this.organizer_group_name,
-            place: this.place,
-            start_time_from: this.start_time_from,
-            start_time_to: this.start_time_to,
-            end_time_from: this.end_time_from,
-            end_time_to: this.end_time_to,
-          }),
-        );
+    this.route.queryParamMap.subscribe((params: ParamMap) => {
+      this.applyQueryParams(params);
+      if (this.hasSearchTerms(params)) {
+        this.performSearch(this.buildQueryParams());
       } else {
         this.results = [];
+        this.loading = false;
+        this.error = '';
       }
     });
   }
 
   onSubmit(): void {
-    const params = buildSearchParams({
-      name: this.name,
-      organizer_group_name: this.organizer_group_name,
-      place: this.place,
-      start_time_from: this.start_time_from,
-      start_time_to: this.start_time_to,
-      end_time_from: this.end_time_from,
-      end_time_to: this.end_time_to,
-    });
-    this.router.navigate(['/search'], { queryParams: params });
+    this.loading = true;
+    this.error = '';
+    this.router.navigate(['/search'], { queryParams: this.buildQueryParams() });
   }
 
-  private buildParams(): { [key: string]: string } {
-    // keep for compatibility but delegate to shared helper
+  private applyQueryParams(params: ParamMap): void {
+    this.name = params.get('name') ?? '';
+    this.organizer_group_name = params.get('organizer_group_name') ?? '';
+    this.place = params.get('place') ?? '';
+    this.start_time_from = formatLocalDateTime(params.get('start_time_from') ?? '') ?? '';
+    this.start_time_to = formatLocalDateTime(params.get('start_time_to') ?? '') ?? '';
+    this.end_time_from = formatLocalDateTime(params.get('end_time_from') ?? '') ?? '';
+    this.end_time_to = formatLocalDateTime(params.get('end_time_to') ?? '') ?? '';
+  }
+
+  private hasSearchTerms(params: ParamMap): boolean {
+    return [
+      params.get('name'),
+      params.get('organizer_group_name'),
+      params.get('place'),
+      params.get('start_time_from'),
+      params.get('start_time_to'),
+      params.get('end_time_from'),
+      params.get('end_time_to'),
+    ].some((value) => !!value);
+  }
+
+  private buildQueryParams(): { [key: string]: string } {
     return buildSearchParams({
       name: this.name,
       organizer_group_name: this.organizer_group_name,
@@ -128,9 +102,6 @@ export class SearchResultsComponent implements OnInit {
       .pipe(timeout(10000))
       .subscribe({
         next: (resp) => {
-          // ApiService returns ApiResponse<T>, but some backends return T directly.
-          // eslint-disable-next-line no-console
-          console.log('GET /events/search response', resp);
           const payload = (resp as any)?.data ?? resp;
           if (Array.isArray(payload)) {
             this.results = payload;
@@ -146,8 +117,6 @@ export class SearchResultsComponent implements OnInit {
           this.loading = false;
         },
         error: (err) => {
-          // eslint-disable-next-line no-console
-          console.error('Failed to load /events/search', err);
           this.error = err?.error?.message || 'Failed to load search results';
           this.loading = false;
         },

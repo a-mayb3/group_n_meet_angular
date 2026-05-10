@@ -1,0 +1,9 @@
+<section class="events-list-container">
+  <h2 *ngIf="title" class="events-list-title">{{ title }}</h2>
+
+  <div *ngIf="events.length" class="events-list">
+    <app-event-card *ngFor="let event of events" [event]="event"></app-event-card>
+  </div>
+
+  <div *ngIf="!events.length" class="empty">{{ emptyMessage }}</div>
+</section>

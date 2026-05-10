@@ -21,7 +21,10 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'organizer-groups/new', component: AddOrganizerGroupComponent, canActivate: [AuthGuard] },
   { path: 'event/new', component: CreateEventComponent, canActivate: [AuthGuard] },
-  { path: 'search', component: SearchResultsComponent, resolve: { searchResults: SearchResolver } },
+  {
+    path: 'search',
+    component: SearchResultsComponent,
+  },
   { path: 'org/:id', component: OrganizerGroupPageComponent, resolve: { group: GroupResolver } },
   { path: 'event/:id', component: EventPageComponent, resolve: { event: EventResolver } },
   { path: 'profile/:id', component: ProfilePageComponent, resolve: { profile: ProfileResolver } },

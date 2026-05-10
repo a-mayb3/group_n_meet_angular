@@ -34,13 +34,10 @@
   <div *ngIf="loading" class="loading">Loading...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 
-  <div *ngIf="results.length" class="results-list">
-    <app-event-result-card
-      *ngFor="let r of results"
-      class="result-item"
-      [event]="r"
-    ></app-event-result-card>
-  </div>
-
-  <div *ngIf="!loading && !results.length && !error" class="empty">No results</div>
+  <app-events-list
+    *ngIf="!loading"
+    [events]="results"
+    title="Search Results"
+    emptyMessage="No results"
+  ></app-events-list>
 </div>

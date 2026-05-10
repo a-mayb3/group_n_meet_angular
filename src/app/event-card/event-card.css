@@ -1,0 +1,23 @@
+/* Individual event card */
+.event-card {
+  padding: 1rem;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+.event-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.event-description {
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+}
+
+.event-meta {
+  font-size: 0.9rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

@@ -4,12 +4,12 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
 import { GroupResolver } from '../../../resolvers/group.resolver';
 import { ApiService } from '../../../services/api.service';
-import { EventResultCard } from '../../../event-result-card/event-result-card';
+import { EventsList } from '../../../events-list/events-list';
 
 @Component({
   selector: 'app-organizer-group-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, EventResultCard],
+  imports: [CommonModule, RouterModule, EventsList],
   templateUrl: './view.html',
   styleUrls: ['./view.css'],
 })
