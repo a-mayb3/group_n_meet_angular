@@ -14,31 +14,31 @@
         <label for="email" class="form-label">Email</label>
         <input
           type="email"
-          id="email"
+          id="email_address"
           class="form-control"
-          [class.is-invalid]="submitted && f['email'].errors"
-          formControlName="email"
+          [class.is-invalid]="submitted && f['email_address'].errors"
+          formControlName="email_address"
           placeholder="Enter your email"
         />
-        <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
-          <span *ngIf="f['email'].errors['required']">Email is required</span>
-          <span *ngIf="f['email'].errors['email']">Email must be valid</span>
+        <div *ngIf="submitted && f['email_address'].errors" class="invalid-feedback">
+          <span *ngIf="f['email_address'].errors['required']">Email is required</span>
+          <span *ngIf="f['email_address'].errors['email']">Email must be valid</span>
         </div>
       </div>
 
       <!-- Display Name Field -->
       <div class="form-group">
-        <label for="displayName" class="form-label">Display Name</label>
+        <label for="display_name" class="form-label">Display Name</label>
         <input
           type="text"
-          id="displayName"
+          id="display_name"
           class="form-control"
-          [class.is-invalid]="submitted && f['displayName'].errors"
-          formControlName="displayName"
+          [class.is-invalid]="submitted && f['display_name'].errors"
+          formControlName="display_name"
           placeholder="Enter a display name"
         />
-        <div *ngIf="submitted && f['displayName'].errors" class="invalid-feedback">
-          <span *ngIf="f['displayName'].errors['required']">Display name is required</span>
+        <div *ngIf="submitted && f['display_name'].errors" class="invalid-feedback">
+          <span *ngIf="f['display_name'].errors['required']">Display name is required</span>
         </div>
       </div>
 
