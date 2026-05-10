@@ -15,14 +15,11 @@
     <section class="group-events">
       <h2>Events by this organizer</h2>
 
-      <div *ngIf="eventsLoading" class="loading">Loading events…</div>
-      <div *ngIf="eventsError" class="error">{{ eventsError }}</div>
-
       <div *ngIf="events && events.length" class="results-list">
         <app-event-result-card *ngFor="let e of events" [event]="e"></app-event-result-card>
       </div>
 
-      <div *ngIf="!eventsLoading && !events.length" class="empty">No events</div>
+      <div *ngIf="!loading && !events.length" class="empty">No events</div>
     </section>
   </section>
 </div>

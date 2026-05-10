@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 import { GroupResolver } from '../../../resolvers/group.resolver';
 import { ApiService } from '../../../services/api.service';
@@ -13,19 +14,23 @@ import { EventResultCard } from '../../../event-result-card/event-result-card';
   templateUrl: './view.html',
   styleUrls: ['./view.css'],
 })
-export class OrganizerGroupPageComponent implements OnInit {
+export class OrganizerGroupPageComponent implements OnInit, OnDestroy {
   group: any | null = null;
   loading = false;
   error = '';
 
   events: any[] = [];
-  eventsLoading = false;
-  eventsError = '';
 
   lastAttemptedEndpoint = '';
   lastResponse: any = null;
   lastError: any = null;
   navStateUsed = false;
+
+  // Guards to prevent repeated/recursive loads
+  private lastAttemptedGroupId: string | null = null;
+  private lastLoadedGroupId: string | null = null;
+
+  private paramSub: Subscription | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -46,10 +51,12 @@ export class OrganizerGroupPageComponent implements OnInit {
       this.navStateUsed = true;
       this.lastResponse = navGroup;
       const gid = this.group?.id ?? this.group?.pk ?? this.group?._id ?? null;
-      if (Array.isArray((this.group as any)?.events) && (this.group as any).events.length) {
+      if (gid) {
+        this.lastLoadedGroupId = String(gid);
+      }
+      // Use resolver-provided events (including empty array if no events)
+      if (Array.isArray((this.group as any)?.events)) {
         this.events = (this.group as any).events;
-      } else if (gid) {
-        this.loadEvents(String(gid));
       }
       return;
     }
@@ -60,28 +67,53 @@ export class OrganizerGroupPageComponent implements OnInit {
       this.loading = false;
       this.lastResponse = resolved;
       const gid = this.group?.id ?? this.group?.pk ?? this.group?._id ?? null;
-      if (Array.isArray((this.group as any)?.events) && (this.group as any).events.length) {
+      if (gid) {
+        this.lastLoadedGroupId = String(gid);
+      }
+      // Use resolver-provided events (including empty array if no events)
+      if (Array.isArray((this.group as any)?.events)) {
         this.events = (this.group as any).events;
-      } else if (gid) {
-        this.loadEvents(String(gid));
       }
       return;
     }
 
-    this.route.paramMap.subscribe((params) => {
+    this.paramSub = this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (!id) {
         this.error = 'Missing organizer group id';
         return;
       }
+
+      // If group already loaded for this id, skip reload
+      if (this.lastLoadedGroupId === id && this.group) {
+        return;
+      }
+
       this.loadGroup(id);
     });
   }
 
+  ngOnDestroy(): void {
+    if (this.paramSub) {
+      this.paramSub.unsubscribe();
+      this.paramSub = null;
+    }
+  }
+
   private loadGroup(id: string): void {
+    // avoid duplicate parallel attempts
+    if (this.loading && this.lastAttemptedGroupId === id) {
+      return;
+    }
+    // if already successfully loaded, skip
+    if (this.lastLoadedGroupId === id && this.group) {
+      return;
+    }
+
     this.loading = true;
     this.error = '';
     this.lastAttemptedEndpoint = `/org/${id}`;
+    this.lastAttemptedGroupId = id;
 
     this.groupResolver
       .resolveById(id)
@@ -93,49 +125,24 @@ export class OrganizerGroupPageComponent implements OnInit {
             this.group = null;
             this.error = `Organizer group ${id} not found`;
             this.loading = false;
+            this.lastAttemptedGroupId = null;
             return;
           }
           this.group = Array.isArray(payload) ? payload[0] : payload;
           this.loading = false;
-          // prefer resolver-provided events; otherwise fetch events for this org
-          if (Array.isArray((this.group as any)?.events) && (this.group as any).events.length) {
+          this.lastLoadedGroupId = id;
+          this.lastAttemptedGroupId = null;
+
+          // Use resolver-provided events (including empty array if no events)
+          if (Array.isArray((this.group as any)?.events)) {
             this.events = (this.group as any).events;
-          } else {
-            this.loadEvents(id);
           }
         },
         error: (err) => {
           this.lastError = err;
           this.error = err?.error?.message || 'Failed to load organizer group';
           this.loading = false;
-        },
-      });
-  }
-
-  private loadEvents(id: string): void {
-    this.eventsLoading = true;
-    this.eventsError = '';
-    this.lastAttemptedEndpoint = `/org/${id}/events/`;
-
-    this.api
-      .get<any>(`/org/${id}/events/`)
-      .pipe(timeout(10000))
-      .subscribe({
-        next: (resp) => {
-          this.lastResponse = resp;
-          const payload = (resp as any)?.data ?? resp;
-          if (Array.isArray(payload)) {
-            this.events = payload;
-          } else if (payload && typeof payload === 'object') {
-            this.events = payload.results ?? payload.items ?? [];
-          } else {
-            this.events = [];
-          }
-          this.eventsLoading = false;
-        },
-        error: (err) => {
-          this.eventsError = err?.error?.message || 'Failed to load events for organizer group';
-          this.eventsLoading = false;
+          this.lastAttemptedGroupId = null;
         },
       });
   }
