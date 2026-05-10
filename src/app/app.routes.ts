@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { AddOrganizerGroupComponent } from './pages/organizer-groups/add/add';
+import { CreateEventComponent } from './pages/event/create/create';
 import { SearchResultsComponent } from './pages/search-results/search-results';
 import { OrganizerGroupPageComponent } from './pages/organizer-groups/view/view';
 import { GroupResolver } from './resolvers/group.resolver';
@@ -19,6 +20,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'organizer-groups/new', component: AddOrganizerGroupComponent, canActivate: [AuthGuard] },
+  { path: 'event/new', component: CreateEventComponent, canActivate: [AuthGuard] },
   { path: 'search', component: SearchResultsComponent, resolve: { searchResults: SearchResolver } },
   { path: 'org/:id', component: OrganizerGroupPageComponent, resolve: { group: GroupResolver } },
   { path: 'event/:id', component: EventPageComponent, resolve: { event: EventResolver } },

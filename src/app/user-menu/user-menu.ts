@@ -47,12 +47,16 @@ export class UserMenu {
 
   navigateToMyReservations(): void {}
   navigateToMyOrganizerGroups(): void {}
-  navigateToAddEvent(): void {}
+
+  navigateToAddEvent(): void {
+    this.showMenu = false;
+    this.router.navigate(['/event', 'new']);
+  }
+
   navigateToAddOrganizerGroup(): void {
     this.showMenu = false;
     this.router.navigate(['/organizer-groups', 'new']);
   }
-
 
   logout(): void {
     this.auth.logout().subscribe({

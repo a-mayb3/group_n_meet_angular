@@ -1,7 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 import { GroupResolver } from '../../../resolvers/group.resolver';
 import { ApiService } from '../../../services/api.service';
@@ -14,7 +13,7 @@ import { EventResultCard } from '../../../event-result-card/event-result-card';
   templateUrl: './view.html',
   styleUrls: ['./view.css'],
 })
-export class OrganizerGroupPageComponent implements OnInit, OnDestroy {
+export class OrganizerGroupPageComponent implements OnInit {
   group: any | null = null;
   loading = false;
   error = '';
@@ -29,8 +28,6 @@ export class OrganizerGroupPageComponent implements OnInit, OnDestroy {
   // Guards to prevent repeated/recursive loads
   private lastAttemptedGroupId: string | null = null;
   private lastLoadedGroupId: string | null = null;
-
-  private paramSub: Subscription | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -61,10 +58,12 @@ export class OrganizerGroupPageComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Always trust the resolver for data loading
     const resolved = (this.route.snapshot && (this.route.snapshot.data as any)?.group) ?? null;
+    this.group = resolved;
+    this.loading = false;
+
     if (resolved) {
-      this.group = resolved;
-      this.loading = false;
       this.lastResponse = resolved;
       const gid = this.group?.id ?? this.group?.pk ?? this.group?._id ?? null;
       if (gid) {
@@ -74,29 +73,8 @@ export class OrganizerGroupPageComponent implements OnInit, OnDestroy {
       if (Array.isArray((this.group as any)?.events)) {
         this.events = (this.group as any).events;
       }
-      return;
-    }
-
-    this.paramSub = this.route.paramMap.subscribe((params) => {
-      const id = params.get('id');
-      if (!id) {
-        this.error = 'Missing organizer group id';
-        return;
-      }
-
-      // If group already loaded for this id, skip reload
-      if (this.lastLoadedGroupId === id && this.group) {
-        return;
-      }
-
-      this.loadGroup(id);
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.paramSub) {
-      this.paramSub.unsubscribe();
-      this.paramSub = null;
+    } else {
+      this.error = 'Failed to load organizer group';
     }
   }
 

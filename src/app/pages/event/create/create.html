@@ -1,0 +1,92 @@
+<div class="create-event-container">
+  <div class="create-event-card">
+    <h1 class="create-title">Create Event</h1>
+
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Event Name</label>
+        <input
+          id="name"
+          class="form-control"
+          formControlName="name"
+          [class.is-invalid]="submitted && f['name'].errors"
+        />
+        <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
+          Event name is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="organizer_group_id">Organizer Group</label>
+        <select
+          id="organizer_group_id"
+          class="form-control"
+          formControlName="organizer_group_id"
+          (change)="onOrganizerGroupChange($event)"
+          [class.is-invalid]="submitted && f['organizer_group_id'].errors"
+        >
+          <option value="">{{ loadingGroups ? 'Loading groups...' : 'Select a group' }}</option>
+          <option *ngFor="let group of organizerGroups" [value]="group.id ?? group.pk ?? group._id">
+            {{ group.display_name ?? group.name }}
+          </option>
+          <option value="create-new" style="color: #667eea; font-weight: 500">
+            + Create new group
+          </option>
+        </select>
+        <div *ngIf="submitted && f['organizer_group_id'].errors" class="invalid-feedback">
+          Organizer group is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          rows="4"
+          class="form-control"
+          formControlName="description"
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="start_time">Start Time</label>
+          <input
+            id="start_time"
+            type="datetime-local"
+            class="form-control"
+            formControlName="start_time"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="end_time">End Time</label>
+          <input
+            id="end_time"
+            type="datetime-local"
+            class="form-control"
+            formControlName="end_time"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="place">Place</label>
+        <input
+          id="place"
+          class="form-control"
+          formControlName="place"
+          placeholder="Location or venue"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create Event' }}
+      </button>
+    </form>
+
+    <p class="back-link"><a routerLink="/dashboard">Back to dashboard</a></p>
+  </div>
+</div>
