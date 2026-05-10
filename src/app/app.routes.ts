@@ -1,7 +1,10 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
+import { AddOrganizerGroupComponent } from './pages/organizer-groups/add/add';
 import { SearchResultsComponent } from './pages/search-results/search-results';
+import { OrganizerGroupPageComponent } from './pages/organizer-groups/view/view';
+import { GroupResolver } from './resolvers/group.resolver';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { AuthGuard } from './guards/auth.guard';
 import { EventPageComponent } from './pages/event/event';
@@ -15,7 +18,9 @@ import { ProfilePageComponent } from './pages/profile/profile';
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'organizer-groups/new', component: AddOrganizerGroupComponent, canActivate: [AuthGuard] },
   { path: 'search', component: SearchResultsComponent, resolve: { searchResults: SearchResolver } },
+  { path: 'org/:id', component: OrganizerGroupPageComponent, resolve: { group: GroupResolver } },
   { path: 'event/:id', component: EventPageComponent, resolve: { event: EventResolver } },
   { path: 'profile/:id', component: ProfilePageComponent, resolve: { profile: ProfileResolver } },
   {
