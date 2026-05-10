@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { EventResultCard } from '../../event-result-card/event-result-card';
+import { buildSearchParams } from '../../utils/search-params';
 
 @Component({
   selector: 'app-search-results',
@@ -75,7 +76,17 @@ export class SearchResultsComponent implements OnInit {
       ].some((v) => !!v);
 
       if (hasAny) {
-        this.performSearch(this.buildParams());
+        this.performSearch(
+          buildSearchParams({
+            name: this.name,
+            organizer_group_name: this.organizer_group_name,
+            place: this.place,
+            start_time_from: this.start_time_from,
+            start_time_to: this.start_time_to,
+            end_time_from: this.end_time_from,
+            end_time_to: this.end_time_to,
+          }),
+        );
       } else {
         this.results = [];
       }
@@ -83,31 +94,29 @@ export class SearchResultsComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const params = this.buildParams();
+    const params = buildSearchParams({
+      name: this.name,
+      organizer_group_name: this.organizer_group_name,
+      place: this.place,
+      start_time_from: this.start_time_from,
+      start_time_to: this.start_time_to,
+      end_time_from: this.end_time_from,
+      end_time_to: this.end_time_to,
+    });
     this.router.navigate(['/search'], { queryParams: params });
   }
 
   private buildParams(): { [key: string]: string } {
-    const params: { [key: string]: string } = {};
-    if (this.name) params['name'] = this.name;
-    if (this.organizer_group_name) params['organizer_group_name'] = this.organizer_group_name;
-    if (this.place) params['place'] = this.place;
-    if (this.start_time_from)
-      params['start_time_from'] = this.formatLocalDateTime(this.start_time_from);
-    if (this.start_time_to) params['start_time_to'] = this.formatLocalDateTime(this.start_time_to);
-    if (this.end_time_from) params['end_time_from'] = this.formatLocalDateTime(this.end_time_from);
-    if (this.end_time_to) params['end_time_to'] = this.formatLocalDateTime(this.end_time_to);
-    return params;
-  }
-
-  private formatLocalDateTime(value: string): string {
-    // input[type=datetime-local] yields values like 'YYYY-MM-DDTHH:mm' (no seconds)
-    // Backend expects a naive datetime; append seconds if missing.
-    if (!value) return value;
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
-      return `${value}:00`;
-    }
-    return value;
+    // keep for compatibility but delegate to shared helper
+    return buildSearchParams({
+      name: this.name,
+      organizer_group_name: this.organizer_group_name,
+      place: this.place,
+      start_time_from: this.start_time_from,
+      start_time_to: this.start_time_to,
+      end_time_from: this.end_time_from,
+      end_time_to: this.end_time_to,
+    });
   }
 
   private performSearch(params: { [key: string]: string }): void {
