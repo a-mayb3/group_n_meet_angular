@@ -18,10 +18,6 @@
     <div *ngIf="profile.bio || profile.description" class="profile-bio">
       {{ profile.bio ?? profile.description }}
     </div>
-
-    <div class="profile-actions">
-      <a routerLink="/search">← Back to search</a>
-    </div>
   </section>
 
   <section class="debug" *ngIf="lastAttemptedEndpoint || lastError || lastResponse">
