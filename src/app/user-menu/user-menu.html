@@ -1,0 +1,21 @@
+<button
+  class="username-btn"
+  (click)="toggleMenu($event)"
+  aria-haspopup="true"
+  [attr.aria-expanded]="showMenu"
+>
+  {{
+    user.display_name ||
+      user.displayName ||
+      user.name ||
+      user.email ||
+      user.email_address ||
+      'Account'
+  }}
+</button>
+
+<div class="user-menu" *ngIf="showMenu" role="menu" aria-label="User menu">
+  <a class="menu-item" (click)="navigateToProfile()" role="menuitem">Profile</a>
+  <a class="menu-item" (click)="navigateToDashboard()" role="menuitem">Dashboard</a>
+  <a class="menu-item" (click)="logout()" role="menuitem">Logout</a>
+</div>

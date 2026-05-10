@@ -10,9 +10,7 @@
 
   <div class="nav-right">
     <ng-container *ngIf="currentUser$ | async as user; else loginLink">
-      <a class="username" [routerLink]="['/profile']" aria-label="Account">
-        {{ user.display_name || user.displayName || user.name || user.email || user.email_address || 'Account' }}
-      </a>
+      <app-user-menu [user]="user"></app-user-menu>
     </ng-container>
     <ng-template #loginLink>
       <a class="login-link" routerLink="/login" aria-label="Login">Login</a>
