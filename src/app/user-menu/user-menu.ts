@@ -34,7 +34,13 @@ export class UserMenu {
 
   navigateToProfile(): void {
     this.showMenu = false;
-    this.router.navigate(['/profile']);
+    const id = this.user?.id ?? this.user?.pk ?? this.user?._id ?? this.user?.user_id ?? null;
+    if (id) {
+      this.router.navigate(['/profile', String(id)]);
+    } else {
+      // No explicit id available — navigate to the resolver-friendly 'me' path
+      this.router.navigate(['/profile', 'me']);
+    }
   }
 
   navigateToDashboard(): void {
