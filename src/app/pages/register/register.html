@@ -1,0 +1,80 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1 class="login-title">Sign Up</h1>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <!-- Register Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          [class.is-invalid]="submitted && f['email'].errors"
+          formControlName="email"
+          placeholder="Enter your email"
+        />
+        <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+          <span *ngIf="f['email'].errors['required']">Email is required</span>
+          <span *ngIf="f['email'].errors['email']">Email must be valid</span>
+        </div>
+      </div>
+
+      <!-- Display Name Field -->
+      <div class="form-group">
+        <label for="displayName" class="form-label">Display Name</label>
+        <input
+          type="text"
+          id="displayName"
+          class="form-control"
+          [class.is-invalid]="submitted && f['displayName'].errors"
+          formControlName="displayName"
+          placeholder="Enter a display name"
+        />
+        <div *ngIf="submitted && f['displayName'].errors" class="invalid-feedback">
+          <span *ngIf="f['displayName'].errors['required']">Display name is required</span>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          [class.is-invalid]="submitted && f['password'].errors"
+          formControlName="password"
+          placeholder="Enter your password"
+        />
+        <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+          <span *ngIf="f['password'].errors['required']">Password is required</span>
+          <span *ngIf="f['password'].errors['minlength']">
+            Password must be at least 6 characters
+          </span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="loading"
+      >
+        <span *ngIf="loading" class="spinner"></span>
+        {{ loading ? 'Signing up...' : 'Sign up' }}
+      </button>
+    </form>
+
+    <!-- Login Link -->
+    <p class="signup-link">
+      Already have an account? <a routerLink="/login">Log in</a>
+    </p>
+  </div>
+</div>

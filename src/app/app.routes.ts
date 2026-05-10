@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
+import { RegisterComponent } from './pages/register/register';
 import { SearchResultsComponent } from './pages/search-results/search-results';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { AuthGuard } from './guards/auth.guard';
@@ -13,6 +14,7 @@ import { ProfilePageComponent } from './pages/profile/profile';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'signup', component: RegisterComponent },
   { path: 'search', component: SearchResultsComponent, resolve: { searchResults: SearchResolver } },
   { path: 'event/:id', component: EventPageComponent, resolve: { event: EventResolver } },
   { path: 'profile', component: ProfilePageComponent, resolve: { profile: ProfileResolver } },
