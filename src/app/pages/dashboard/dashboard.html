@@ -15,7 +15,7 @@
     <div *ngIf="rsvpsError" class="error">{{ rsvpsError }}</div>
     <div *ngIf="rsvps && rsvps.length; else noRsvps">
       <div class="rsvp-list">
-        <app-rsvp-card *ngFor="let rsvp of rsvps" [rsvp]="rsvp"></app-rsvp-card>
+        <app-event-card *ngFor="let rsvp of rsvps" [rsvp]="rsvp"></app-event-card>
       </div>
     </div>
   </section>

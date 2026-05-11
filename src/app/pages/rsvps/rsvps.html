@@ -4,8 +4,8 @@
   <div *ngIf="loading" class="loading">Loading your RSVPs…</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 
-  <div *ngIf="!loading && rsvps.length; else noRsvps" class="rsvp-list">
-    <app-rsvp-card *ngFor="let rsvp of rsvps" [rsvp]="rsvp"></app-rsvp-card>
+  <div *ngIf="!loading && filteredRsvps.length; else noRsvps" class="rsvp-list">
+    <app-event-card *ngFor="let rsvp of filteredRsvps" [rsvp]="rsvp"></app-event-card>
   </div>
 
   <ng-template #noRsvps>

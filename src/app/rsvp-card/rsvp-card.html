@@ -1,8 +1,0 @@
-<article class="rsvp-card" *ngIf="rsvp">
-  <a [routerLink]="['/event', rsvp.event_id]" class="rsvp-event-link">Event: {{ rsvp.event_id }}</a>
-  <div class="rsvp-meta">
-    <div><strong>Reserved:</strong> {{ rsvp.reserved_at | date: 'medium' }}</div>
-    <div><strong>Cancelled:</strong> {{ rsvp.is_cancelled ? 'Yes' : 'No' }}</div>
-  </div>
-</article>
-<div *ngIf="!rsvp">No RSVP</div>

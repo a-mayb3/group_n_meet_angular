@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
 import { timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
-import { RsvpCard } from '../../rsvp-card/rsvp-card';
+import { EventCard } from '../../event-card/event-card';
 
 @Component({
   selector: 'app-rsvps-page',
   standalone: true,
-  imports: [CommonModule, RsvpCard],
+  imports: [CommonModule, EventCard],
   templateUrl: './rsvps.html',
   styleUrls: ['./rsvps.css'],
 })
@@ -24,6 +24,10 @@ export class RsvpsPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadRsvps();
+  }
+
+  get filteredRsvps(): any[] {
+    return this.rsvps.filter((rsvp) => !rsvp.is_cancelled);
   }
 
   private loadRsvps(): void {

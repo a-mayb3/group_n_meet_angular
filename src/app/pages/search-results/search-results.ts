@@ -80,6 +80,10 @@ export class SearchResultsComponent implements OnInit {
     ].some((value) => !!value);
   }
 
+  get filteredResults(): any[] {
+    return this.results.filter((event) => !event.is_cancelled);
+  }
+
   private buildQueryParams(): { [key: string]: string } {
     return buildSearchParams({
       name: this.name,

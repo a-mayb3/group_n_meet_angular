@@ -1,15 +1,31 @@
-<article class="event-card" role="article">
-  <h3 class="event-title">
-    <a *ngIf="id; else plainTitle" href="#" (click)="open($event)">{{ title }}</a>
-    <ng-template #plainTitle>{{ title }}</ng-template>
-  </h3>
+<article
+  class="event-card"
+  role="button"
+  tabindex="0"
+  [attr.aria-label]="'Open event ' + title"
+  (click)="id && activate($event)"
+  (keydown.enter)="id && activate($event)"
+  (keydown.space)="id && activate($event)"
+>
+  <ng-container *ngIf="!isRsvpCard; else rsvpCard">
+    <h3 class="event-title">{{ title }}</h3>
 
-  <p *ngIf="description" class="event-description">{{ description }}</p>
+    <p *ngIf="description" class="event-description">{{ description }}</p>
 
-  <div class="event-meta">
-    <small *ngIf="event?.starts_at || event?.start_time"
-      >Starts: {{ event.starts_at ?? event.start_time }}</small
-    >
-    <small *ngIf="event?.location"> • {{ event.location }}</small>
-  </div>
+    <div class="event-meta">
+      <small *ngIf="event?.starts_at || event?.start_time"
+        >Starts: {{ event.starts_at ?? event.start_time }}</small
+      >
+      <small *ngIf="event?.location"> • {{ event.location }}</small>
+    </div>
+  </ng-container>
+
+  <ng-template #rsvpCard>
+    <h3 class="event-title">{{ title }}</h3>
+
+    <div class="event-meta">
+      <small *ngIf="reservedAt">Reserved: {{ reservedAt | date: 'medium' }}</small>
+      <small *ngIf="rsvp?.is_cancelled"> • Cancelled: Yes</small>
+    </div>
+  </ng-template>
 </article>
