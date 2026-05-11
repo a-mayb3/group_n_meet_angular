@@ -16,6 +16,28 @@
 .event-description {
   margin-bottom: 1rem;
 }
+.event-actions {
+  margin: 0.5rem 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reservation-button {
+  align-self: flex-start;
+  padding: 0.6rem 1rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.reservation-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .event-actions a {
   color: #0066cc;
   text-decoration: none;

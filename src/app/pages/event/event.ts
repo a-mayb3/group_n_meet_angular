@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
 import { from, of } from 'rxjs';
@@ -22,12 +23,17 @@ export class EventPageComponent implements OnInit {
   lastResponse: any = null;
   lastError: any = null;
   navStateUsed = false;
+  rsvps: any[] = [];
+  rsvpsLoading = false;
+  rsvpsError = '';
+  reservationLoading = false;
 
   constructor(
     private route: ActivatedRoute,
     private api: ApiService,
     private router: Router,
     private groupResolver: GroupResolver,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -41,6 +47,7 @@ export class EventPageComponent implements OnInit {
       this.loading = false;
       this.navStateUsed = true;
       this.lastResponse = navEvent;
+      this.applyResolvedRsvps((this.route.snapshot.data as any)?.['rsvps']);
       return;
     }
 
@@ -50,6 +57,7 @@ export class EventPageComponent implements OnInit {
       this.event = resolved;
       this.loading = false;
       this.lastResponse = resolved;
+      this.applyResolvedRsvps((this.route.snapshot.data as any)?.['rsvps']);
       return;
     }
 
@@ -61,12 +69,29 @@ export class EventPageComponent implements OnInit {
       }
       this.loadEvent(id);
     });
+
+    this.route.data.subscribe((data) => {
+      this.applyResolvedRsvps(data?.['rsvps']);
+    });
+  }
+
+  private applyResolvedRsvps(resolved: any[] | null | undefined): void {
+    if (Array.isArray(resolved)) {
+      this.rsvps = resolved;
+      this.rsvpsLoading = false;
+      this.rsvpsError = '';
+      this.cdr.detectChanges();
+      return;
+    }
+    this.rsvps = [];
+    this.rsvpsLoading = false;
+    this.cdr.detectChanges();
   }
 
   private loadEvent(id: string): void {
     this.loading = true;
     this.error = '';
-    const endpoints = [`/events/${id}`, `/events/${id}/`, `/event/${id}`, `/event/${id}/`];
+    const endpoints = [`/events/${id}`, `/events/${id}/`];
 
     const tryEndpoints$ = from(endpoints).pipe(
       concatMap((ep) =>
@@ -100,6 +125,82 @@ export class EventPageComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  get currentEventId(): string | null {
+    return this.event?.id ?? this.event?.pk ?? this.event?._id ?? this.event?.slug ?? null;
+  }
+
+  get activeReservation(): any | null {
+    const eventId = this.currentEventId;
+    if (!eventId) return null;
+
+    return (
+      this.rsvps.find(
+        (rsvp) => String(rsvp?.event_id) === String(eventId) && !rsvp?.is_cancelled,
+      ) ?? null
+    );
+  }
+
+  get reservationButtonLabel(): string {
+    if (this.rsvpsLoading) return 'Checking reservation…';
+    return this.activeReservation ? 'Cancel reservation' : 'Reserve spot';
+  }
+
+  toggleReservation(): void {
+    const eventId = this.currentEventId;
+    if (!eventId || this.reservationLoading || this.rsvpsLoading) return;
+
+    const removeEndpoint = `/events/${eventId}/remove_me`;
+    const addEndpoint = `/events/${eventId}/add_me`;
+
+    this.reservationLoading = true;
+    this.rsvpsError = '';
+
+    const request$ = this.activeReservation
+      ? this.api.delete<any>(removeEndpoint)
+      : this.api.post<any>(addEndpoint, {});
+
+    request$.pipe(timeout(10000)).subscribe({
+      next: () => {
+        this.reservationLoading = false;
+        this.refreshRsvps();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.rsvpsError = err?.error?.message || 'Failed to update reservation';
+        this.reservationLoading = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private refreshRsvps(): void {
+    this.rsvpsLoading = true;
+    this.rsvpsError = '';
+
+    this.api
+      .get<any>('/me/get_rsvps')
+      .pipe(timeout(10000))
+      .subscribe({
+        next: (resp) => {
+          const payload = (resp as any)?.data ?? resp;
+          if (Array.isArray(payload)) {
+            this.rsvps = payload;
+          } else if (payload && typeof payload === 'object') {
+            this.rsvps = payload.results ?? payload.items ?? [];
+          } else {
+            this.rsvps = [];
+          }
+          this.rsvpsLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.rsvpsError = err?.error?.message || 'Failed to load RSVPs';
+          this.rsvpsLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   private resolveOrganizerNameIfNeeded(eventObj: any): void {

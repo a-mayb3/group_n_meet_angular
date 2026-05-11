@@ -1,9 +1,20 @@
 <div class="event-page">
-
   <div *ngIf="loading" class="loading">Loading event…</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <article *ngIf="!loading && event" class="event-detail">
+    <div class="event-actions">
+      <button
+        type="button"
+        class="reservation-button"
+        (click)="toggleReservation()"
+        [disabled]="reservationLoading || rsvpsLoading"
+      >
+        {{ reservationButtonLabel }}
+      </button>
+      <div *ngIf="rsvpsError" class="error">{{ rsvpsError }}</div>
+    </div>
+
     <h1 class="event-title">
       {{ event.title ?? event.name ?? event.event_title }}
     </h1>
@@ -18,11 +29,19 @@
       </small>
 
       <small *ngIf="event.location"> Where: {{ event.location }} </small>
-      <div *ngIf="event && (event.organizer_group_name || event.organizer_group_id || event.group_id)" class="organizer-section">
+      <div
+        *ngIf="event && (event.organizer_group_name || event.organizer_group_id || event.group_id)"
+        class="organizer-section"
+      >
         <p>
           <strong>Organizer Group:</strong>
           <a class="organizer-link" (click)="navigateToOrganizerGroup()">
-            {{ event.organizer_group_name || event.organizer_group?.name || event.group?.name || 'View organizer group' }}
+            {{
+              event.organizer_group_name ||
+                event.organizer_group?.name ||
+                event.group?.name ||
+                'View organizer group'
+            }}
           </a>
         </p>
       </div>

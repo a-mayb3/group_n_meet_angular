@@ -13,6 +13,7 @@ import { SearchResolver } from './resolvers/search.resolver';
 import { DashboardResolver } from './resolvers/dashboard.resolver';
 import { EventResolver } from './resolvers/event.resolver';
 import { ProfileResolver } from './resolvers/profile.resolver';
+import { RsvpsResolver } from './resolvers/rsvps.resolver';
 import { ProfilePageComponent } from './pages/profile/profile';
 import { RsvpsPageComponent } from './pages/rsvps/rsvps';
 
@@ -26,7 +27,11 @@ export const routes: Routes = [
     component: SearchResultsComponent,
   },
   { path: 'org/:id', component: OrganizerGroupPageComponent, resolve: { group: GroupResolver } },
-  { path: 'event/:id', component: EventPageComponent, resolve: { event: EventResolver } },
+  {
+    path: 'event/:id',
+    component: EventPageComponent,
+    resolve: { event: EventResolver, rsvps: RsvpsResolver },
+  },
   { path: 'profile/:id', component: ProfilePageComponent, resolve: { profile: ProfileResolver } },
   {
     path: 'rsvps',
