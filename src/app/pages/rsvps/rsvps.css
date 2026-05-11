@@ -1,0 +1,23 @@
+.rsvps-page {
+  padding: 1rem;
+}
+
+.rsvps-page h1 {
+  margin: 0 0 1rem;
+}
+
+.rsvp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.loading,
+.empty,
+.error {
+  padding: 1rem 0;
+}
+
+.error {
+  color: #b00020;
+}

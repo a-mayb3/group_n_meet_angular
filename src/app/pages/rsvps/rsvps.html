@@ -1,0 +1,14 @@
+<div class="rsvps-page">
+  <h1>My RSVPs</h1>
+
+  <div *ngIf="loading" class="loading">Loading your RSVPs…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!loading && rsvps.length; else noRsvps" class="rsvp-list">
+    <app-rsvp-card *ngFor="let rsvp of rsvps" [rsvp]="rsvp"></app-rsvp-card>
+  </div>
+
+  <ng-template #noRsvps>
+    <div class="empty">No RSVPs found</div>
+  </ng-template>
+</div>
