@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef } from '@angular/core';
 import { timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { RsvpCard } from '../../rsvp-card/rsvp-card';
@@ -16,7 +17,10 @@ export class RsvpsPageComponent implements OnInit {
   loading = false;
   error = '';
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.loadRsvps();
@@ -40,10 +44,12 @@ export class RsvpsPageComponent implements OnInit {
             this.rsvps = [];
           }
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.error = err?.error?.message || 'Failed to load RSVPs';
           this.loading = false;
+          this.cdr.detectChanges();
         },
       });
   }
