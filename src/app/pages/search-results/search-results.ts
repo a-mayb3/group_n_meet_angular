@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
@@ -31,6 +32,7 @@ export class SearchResultsComponent implements OnInit {
     private api: ApiService,
     private route: ActivatedRoute,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -43,20 +45,17 @@ export class SearchResultsComponent implements OnInit {
 
     this.route.queryParamMap.subscribe((params: ParamMap) => {
       this.applyQueryParams(params);
-      if (this.hasSearchTerms(params)) {
-        this.performSearch(this.buildQueryParams());
-      } else {
-        this.results = [];
-        this.loading = false;
-        this.error = '';
-      }
     });
   }
 
   onSubmit(): void {
+    const params = this.buildQueryParams();
     this.loading = true;
     this.error = '';
-    this.router.navigate(['/search'], { queryParams: this.buildQueryParams() });
+    this.results = [];
+    this.cdr.detectChanges();
+    this.performSearch(params);
+    this.router.navigate(['/search'], { queryParams: params });
   }
 
   private applyQueryParams(params: ParamMap): void {
@@ -115,10 +114,12 @@ export class SearchResultsComponent implements OnInit {
             this.results = [];
           }
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.error = err?.error?.message || 'Failed to load search results';
           this.loading = false;
+          this.cdr.detectChanges();
         },
       });
   }
