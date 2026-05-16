@@ -5,7 +5,8 @@ nav {
   min-height: 3rem;
   height: min-content;
 
-  border: 1px solid black;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
 
   display: flex;
   flex-direction: row;
@@ -33,16 +34,18 @@ nav {
   align-items: center;
   flex: 1 1 auto;
   justify-content: center;
-  max-width: 800px;
 }
 
 .navbar-search-form input {
   padding: 0.4rem 0.6rem;
-  min-width: 140px;
+  border: 1px solid var(--border-color);
+  border-radius: 0;
 }
 
 .navbar-search-form button {
   padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0;
 }
 
 /* User menu styles */
@@ -59,31 +62,4 @@ nav {
   font-weight: 600;
   color: inherit;
   padding: 0.25rem 0.5rem;
-}
-
-.user-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.5rem);
-  background: white;
-  border: 1px solid #ddd;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  border-radius: 6px;
-  min-width: 160px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.user-menu .menu-item {
-  display: block;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: #333;
-  cursor: pointer;
-}
-
-.user-menu .menu-item:hover {
-  background: #f7f7f7;
 }

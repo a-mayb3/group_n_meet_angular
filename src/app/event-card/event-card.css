@@ -5,16 +5,6 @@
   cursor: pointer;
 }
 
-.event-card:active {
-  transform: translateY(1px);
-}
-
-.event-card:hover,
-.event-card:focus {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
-
 .event-title {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;

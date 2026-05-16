@@ -1,16 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { timeout, take } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
+import { timeout, take, concatMap, toArray, filter as rxFilter } from 'rxjs/operators';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { from } from 'rxjs';
+import { ChangeDetectorRef } from '@angular/core';
+import { GroupResolver } from '../../resolvers/group.resolver';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserBase } from '../../models/user.model';
 import { RsvpCardComponent } from '../../rsvp-card/rsvp-card';
+import { OrganizerGroupCardComponent } from '../../organizer-group-card/organizer-group-card';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RsvpCardComponent],
+  imports: [CommonModule, RsvpCardComponent, OrganizerGroupCardComponent, RouterModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
 })
@@ -21,11 +25,16 @@ export class DashboardComponent implements OnInit {
   rsvps: any[] = [];
   rsvpsLoading = false;
   rsvpsError = '';
+  orgGroups: any[] = [];
+  orgsLoading = false;
+  orgsError = '';
 
   constructor(
     private api: ApiService,
     private auth: AuthService,
     private route: ActivatedRoute,
+    private groupResolver: GroupResolver,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +54,7 @@ export class DashboardComponent implements OnInit {
       this.user = resolved;
       this.loading = false;
       if (!rsvpsResolved) this.fetchRsvps();
+      this.fetchOrgGroups();
       return;
     }
 
@@ -54,6 +64,7 @@ export class DashboardComponent implements OnInit {
         this.user = user;
         this.loading = false;
         if (!rsvpsResolved) this.fetchRsvps();
+        this.fetchOrgGroups();
       } else {
         // Fallback: try to load user directly
         this.loadUser();
@@ -79,7 +90,69 @@ export class DashboardComponent implements OnInit {
         this.rsvps = data['rsvps'];
         this.rsvpsLoading = false;
       }
+      if (data && data['dashboardUser']) {
+        // ensure org groups are refreshed when resolver provides user
+        this.fetchOrgGroups();
+      }
     });
+  }
+
+  private fetchOrgGroups(): void {
+    if (!this.user) return;
+    this.orgsLoading = true;
+    this.orgsError = '';
+
+    this.api
+      .get<any>('/me/get_orgs')
+      .pipe(timeout(10000))
+      .subscribe({
+        next: (resp) => {
+          const payload = (resp as any)?.data ?? resp;
+          let list: any[] = [];
+          if (Array.isArray(payload)) list = payload;
+          else if (payload && typeof payload === 'object')
+            list = payload.results ?? payload.items ?? [];
+          // Use GroupResolver to enrich each group (attach events etc.)
+          from(list)
+            .pipe(
+              concatMap((g) => {
+                const gid = g?.id ?? g?.pk ?? g?._id ?? null;
+                if (!gid) return [g];
+                return this.groupResolver.resolveById(String(gid));
+              }),
+              rxFilter((x) => x != null),
+              toArray(),
+            )
+            .subscribe({
+              next: (resolvedGroups) => {
+                this.orgGroups = resolvedGroups as any[];
+                this.orgsLoading = false;
+                // ensure template updates after async resolver enrichment
+                try {
+                  this.cdr.detectChanges();
+                } catch {
+                  // ignore detection failures
+                }
+              },
+              error: (err) => {
+                // fallback to raw list if resolver enrichment fails
+                // eslint-disable-next-line no-console
+                console.error('Failed to enrich org groups via resolver', err);
+                this.orgGroups = list;
+                this.orgsLoading = false;
+                try {
+                  this.cdr.detectChanges();
+                } catch {}
+              },
+            });
+        },
+        error: (err) => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to load /me/get_orgs', err);
+          this.orgsError = err?.error?.message || 'Failed to load organizer groups';
+          this.orgsLoading = false;
+        },
+      });
   }
 
   private loadUser(): void {

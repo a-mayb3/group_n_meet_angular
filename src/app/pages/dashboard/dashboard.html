@@ -3,17 +3,17 @@
 
   <div *ngIf="error" class="error">{{ error }}</div>
 
-  <div *ngIf="user">
+  <section *ngIf="user" class="user_greeting_section">
     <h1 class="welcome_user">
       Welcome, <i>{{ user.display_name }}!</i>
     </h1>
-  </div>
+  </section>
 
-  <section>
+  <section class="rsvp_section">
     <h2>Your RSVPs</h2>
     <div *ngIf="rsvpsLoading">Loading your RSVPs…</div>
     <div *ngIf="rsvpsError" class="error">{{ rsvpsError }}</div>
-    <div *ngIf="rsvps && rsvps.length; else noRsvps">
+    <div *ngIf="rsvps.filter((e) => !e.is_cancelled).length; else noRsvps">
       <div class="rsvp-list">
         <app-rsvp-card
           *ngFor="let rsvp of rsvps.filter((e) => !e.is_cancelled)"
@@ -21,8 +21,25 @@
         ></app-rsvp-card>
       </div>
     </div>
+    <ng-template #noRsvps>
+      <div>No RSVPs found</div>
+    </ng-template>
   </section>
-  <ng-template #noRsvps>
-    <div>No RSVPs found</div>
-  </ng-template>
+
+  <section class="orgs_section">
+    <h2>Your Organizer Groups</h2>
+    <div *ngIf="orgsLoading">Loading your organizer groups…</div>
+    <div *ngIf="orgsError" class="error">{{ orgsError }}</div>
+    <div *ngIf="orgGroups.length; else noOrgs">
+      <div class="org-list">
+        <app-organizer-group-card
+          *ngFor="let group of orgGroups"
+          [group]="group"
+        ></app-organizer-group-card>
+      </div>
+    </div>
+    <ng-template #noOrgs>
+      <div>No organizer groups found</div>
+    </ng-template>
+  </section>
 </div>

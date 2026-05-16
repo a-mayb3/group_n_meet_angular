@@ -1,5 +1,4 @@
 .create-org-container {
-  min-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,8 +9,6 @@
   padding: 2rem;
   width: 100%;
   max-width: 40%;
-  border-radius: 6px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
 }
 
 .create-title {
@@ -29,7 +26,6 @@
 .form-control {
   padding: 0.6rem;
   border: 1px solid #ddd;
-  border-radius: 4px;
 }
 
 .invalid-feedback {

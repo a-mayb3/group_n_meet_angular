@@ -1,0 +1,18 @@
+<article
+  class="org-card"
+  [attr.role]="id ? 'button' : null"
+  [attr.tabindex]="id ? 0 : null"
+  [attr.aria-label]="id ? 'Open organizer group ' + title : null"
+  (click)="id && activate($event)"
+  (keydown.enter)="id && activate($event)"
+  (keydown.space)="$event.preventDefault(); id && activate($event)"
+>
+  <h3 class="org-title">{{ title }}</h3>
+
+  <p *ngIf="description" class="org-description">{{ description }}</p>
+
+  <div class="org-meta">
+    <small *ngIf="eventsCount !== null">Events: {{ eventsCount }}</small>
+    <small *ngIf="membersCount !== null"> • Members: {{ membersCount }}</small>
+  </div>
+</article>

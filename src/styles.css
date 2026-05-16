@@ -1,17 +1,31 @@
 /* You can add global styles to this file, and also import other style files */
 
-/*
 :root{
+  --border-color: #000f;
+  --form-label-color: #333;
 
+  --background-color: #f9f9f9;
+  --primary-color: #667eea;
+  --primary-text-color: black;
 }
-*/
 
 body {
   margin: 0;
   padding: 0;
 
+  color: var(--primary-text-color);
+  background-color: var(--background-color);
 }
 
 textarea {
-  resize: none;
+  resize: vertical;
+}
+
+input, select, textarea {
+  background-color: transparent;
+}
+
+input, select, textarea, button {
+  border: 1px solid var(--border-color);
+  border-radius: 0;
 }
