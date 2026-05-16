@@ -80,8 +80,8 @@ export class CreateEventComponent implements OnInit {
     const body: any = {
       name: this.f['name'].value,
       description: this.f['description'].value || undefined,
-      start_time: this.f['start_time'].value || undefined,
-      end_time: this.f['end_time'].value || undefined,
+      start_time: this.isoFromDateTimeLocal(this.f['start_time'].value) || undefined,
+      end_time: this.isoFromDateTimeLocal(this.f['end_time'].value) || undefined,
       place: this.f['place'].value || undefined,
       organizer_group_id: this.f['organizer_group_id'].value,
     };
@@ -103,5 +103,16 @@ export class CreateEventComponent implements OnInit {
         this.error = err?.error?.message || 'Failed to create event';
       },
     });
+  }
+
+  private isoFromDateTimeLocal(value: string | null | undefined): string | null {
+    if (!value) return null;
+    try {
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return null;
+      return d.toISOString();
+    } catch {
+      return null;
+    }
   }
 }

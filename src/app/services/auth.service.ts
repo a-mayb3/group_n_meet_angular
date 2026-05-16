@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
-import { Observable, BehaviorSubject, of } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, from } from 'rxjs';
+import { map, catchError, switchMap, filter, take, defaultIfEmpty } from 'rxjs/operators';
 import { UserBase } from '../models/user.model';
+import { OrganizerGroupBase } from '../models/organizer-group.model';
 import { environment } from '../../environments/environment';
 
 export interface LoginRequest {
@@ -145,13 +146,16 @@ export class AuthService {
             if (body && body.access_token) {
               this.setTokens(body.access_token, body.refresh_token);
               // refresh succeeded, repopulate current user if available
-              this.loadCurrentUser().subscribe(() => {
-                observer.next(body);
-                observer.complete();
-              }, (err) => {
-                observer.next(body);
-                observer.complete();
-              });
+              this.loadCurrentUser().subscribe(
+                () => {
+                  observer.next(body);
+                  observer.complete();
+                },
+                (err) => {
+                  observer.next(body);
+                  observer.complete();
+                },
+              );
             } else {
               // No tokens returned -> treat as failure
               this.clearTokens();
@@ -173,23 +177,283 @@ export class AuthService {
    * Returns an observable resolving to the user object or null on failure.
    */
   loadCurrentUser(): Observable<UserBase | null> {
+    return this.http.get<any>(`${environment.apiUrl}/me/`, { withCredentials: true }).pipe(
+      map((body) => {
+        const user = (body && (body.data ?? body.user)) ?? body;
+        if (user && user.email_address) {
+          this.currentUserSubject.next(user as UserBase);
+          return user as UserBase;
+        }
+        this.currentUserSubject.next(null);
+        return null;
+      }),
+      catchError(() => {
+        this.currentUserSubject.next(null);
+        return of(null);
+      }),
+    );
+  }
+
+  /**
+   * Check whether the current logged-in user owns the given event through org groups.
+   */
+  ownsEventThroughOrgGroups(
+    event: any,
+    currentUser: any = this.currentUserSubject.getValue(),
+  ): boolean {
+    const eventGroupIds = this.extractEventGroupIds(event);
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] Event group IDs extracted:', eventGroupIds);
+    if (!eventGroupIds.length) {
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] No event group IDs found, returning false');
+      return false;
+    }
+
+    const userGroupIds = this.extractUserGroupIds(currentUser);
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] User group IDs extracted:', userGroupIds);
+    if (!userGroupIds.length) {
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] No user group IDs found, returning false');
+      return false;
+    }
+
+    const result = eventGroupIds.some((groupId) => userGroupIds.includes(String(groupId)));
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] Comparing:', { eventGroupIds, userGroupIds, result });
+    return result;
+  }
+
+  /**
+   * Check if user owns event by checking org group membership
+   * Returns Observable<boolean> that fetches org group data if needed
+   */
+  ownsEventThroughOrgGroupsAsync(
+    event: any,
+    currentUser: any = this.currentUserSubject.getValue(),
+  ): Observable<boolean> {
+    if (!event || !currentUser) {
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] Missing event or currentUser');
+      return of(false);
+    }
+
+    const eventGroupIds = this.extractEventGroupIds(event);
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] Event group IDs extracted:', eventGroupIds);
+    if (!eventGroupIds.length) {
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] No event group IDs found in event');
+      return of(false);
+    }
+
+    // Check each event group to see if current user is a member
+    return from(eventGroupIds).pipe(
+      switchMap((groupId) => this.isCurrentUserMemberOfOrgGroup(groupId, currentUser)),
+      filter((isMember) => isMember === true),
+      take(1),
+      map(() => true),
+      defaultIfEmpty(false),
+    );
+  }
+
+  /**
+   * Check whether the current user is a member of a specific org group.
+   */
+  isCurrentUserMemberOfOrgGroup(
+    group: OrganizerGroupBase | string | number | null | undefined,
+    currentUser: any = this.currentUserSubject.getValue(),
+  ): Observable<boolean> {
+    if (!group || !currentUser) {
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] Missing group or currentUser');
+      return of(false);
+    }
+
+    const groupId = this.extractEntityId(group);
+    if (!groupId) {
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] Missing group id');
+      return of(false);
+    }
+
+    const currentUserId = this.extractEntityId(currentUser);
+    if (!currentUserId) {
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] Missing current user id');
+      return of(false);
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] Checking membership in org group:', groupId);
     return this.http
-      .get<any>(`${environment.apiUrl}/me/`, { withCredentials: true })
+      .get<any>(`${environment.apiUrl}/org/${groupId}`, {
+        withCredentials: true,
+      })
       .pipe(
-        map((body) => {
-          const user = (body && (body.data ?? body.user)) ?? body;
-          if (user && user.email_address) {
-            this.currentUserSubject.next(user as UserBase);
-            return user as UserBase;
-          }
-          this.currentUserSubject.next(null);
-          return null;
+        map((resp) => (resp as any)?.data ?? resp),
+        map((payload) => (Array.isArray(payload) ? (payload[0] ?? null) : (payload ?? null))),
+        map((groupObj) => {
+          // eslint-disable-next-line no-console
+          console.log('[AUTH] Fetched org group:', groupObj);
+          const memberIds = this.extractOrgGroupMemberIds(groupObj);
+          // eslint-disable-next-line no-console
+          console.log('[AUTH] Org group member IDs:', memberIds);
+
+          const isMember = memberIds.includes(String(currentUserId));
+          // eslint-disable-next-line no-console
+          console.log('[AUTH] Is current user a member?', isMember);
+          return isMember;
         }),
-        catchError(() => {
-          this.currentUserSubject.next(null);
-          return of(null);
+        catchError((err) => {
+          // eslint-disable-next-line no-console
+          console.warn('[AUTH] Failed to fetch org group:', err);
+          return of(false);
         }),
       );
+  }
+
+  private extractEventGroupIds(event: any): string[] {
+    const ids = new Set<string>();
+    const candidates = [
+      event?.organizer_group_id,
+      event?.group_id,
+      event?.organizer_id,
+      event?.organizer_group,
+      event?.group,
+      event?.organizer,
+    ];
+
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] extractEventGroupIds - checking event:', {
+      organizer_group_id: event?.organizer_group_id,
+      group_id: event?.group_id,
+      organizer_id: event?.organizer_id,
+      organizer_group: event?.organizer_group,
+      group: event?.group,
+      organizer: event?.organizer,
+    });
+
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate)) {
+        for (const item of candidate) {
+          const id = this.extractEntityId(item);
+          if (id) ids.add(String(id));
+        }
+        continue;
+      }
+
+      if (candidate && typeof candidate === 'object') {
+        const id = this.extractEntityId(candidate);
+        if (id) ids.add(String(id));
+        continue;
+      }
+
+      if (candidate != null && candidate !== '') {
+        ids.add(String(candidate));
+      }
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] extractEventGroupIds - result:', Array.from(ids));
+    return Array.from(ids);
+  }
+
+  private extractUserGroupIds(user: any): string[] {
+    const ids = new Set<string>();
+    const candidates = [
+      user?.organizer_groups,
+      user?.org_groups,
+      user?.groups,
+      user?.group_ids,
+      user?.organizer_group_ids,
+      user?.member_groups,
+      user?.owned_groups,
+    ];
+
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] extractUserGroupIds - checking user:', {
+      organizer_groups: user?.organizer_groups,
+      org_groups: user?.org_groups,
+      groups: user?.groups,
+      group_ids: user?.group_ids,
+      organizer_group_ids: user?.organizer_group_ids,
+      member_groups: user?.member_groups,
+      owned_groups: user?.owned_groups,
+    });
+
+    const addCandidate = (candidate: any): void => {
+      if (Array.isArray(candidate)) {
+        candidate.forEach((item) => addCandidate(item));
+        return;
+      }
+
+      if (candidate && typeof candidate === 'object') {
+        const id = this.extractEntityId(candidate);
+        if (id) ids.add(String(id));
+        return;
+      }
+
+      if (candidate != null && candidate !== '') {
+        ids.add(String(candidate));
+      }
+    };
+
+    candidates.forEach((candidate) => addCandidate(candidate));
+    // eslint-disable-next-line no-console
+    console.log('[AUTH] extractUserGroupIds - result:', Array.from(ids));
+    return Array.from(ids);
+  }
+
+  private extractOrgGroupMemberIds(group: any): string[] {
+    const ids = new Set<string>();
+    const candidates = [
+      group?.members,
+      group?.group_members,
+      group?.member_ids,
+      group?.users,
+      group?.user_ids,
+      group?.organizer_group_members,
+    ];
+
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate)) {
+        for (const item of candidate) {
+          const id = this.extractEntityId(item);
+          if (id) ids.add(String(id));
+        }
+        continue;
+      }
+
+      if (candidate && typeof candidate === 'object') {
+        const id = this.extractEntityId(candidate);
+        if (id) ids.add(String(id));
+        continue;
+      }
+
+      if (candidate != null && candidate !== '') {
+        ids.add(String(candidate));
+      }
+    }
+
+    return Array.from(ids);
+  }
+
+  private extractEntityId(entity: any): string | null {
+    if (entity == null) return null;
+    if (typeof entity === 'string' || typeof entity === 'number') {
+      return String(entity);
+    }
+    return (
+      entity?.id ??
+      entity?.pk ??
+      entity?._id ??
+      entity?.group_id ??
+      entity?.user_id ??
+      entity?.profile_id ??
+      null
+    );
   }
 
   /**

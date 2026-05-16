@@ -3,18 +3,7 @@
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <article *ngIf="!loading && event" class="event-detail">
-    <div class="event-actions">
-      <button
-        type="button"
-        class="reservation-button"
-        (click)="toggleReservation()"
-        [disabled]="reservationLoading || rsvpsLoading"
-      >
-        {{ reservationButtonLabel }}
-      </button>
-      <div *ngIf="rsvpsError" class="error">{{ rsvpsError }}</div>
-    </div>
-
+    
     <h1 class="event-title">
       {{ event.title ?? event.name ?? event.event_title }}
     </h1>
@@ -47,4 +36,25 @@
       </div>
     </div>
   </article>
+  <div class="event-actions">
+      
+    <button
+      type="button"
+      class="reservation-button"
+      (click)="toggleReservation()"
+      [disabled]="reservationLoading || rsvpsLoading"
+    >
+      {{ reservationButtonLabel }}
+    </button>
+    <button
+      *ngIf="currentUserOwnsEvent"
+      type="button"
+      class="edit-button"
+      (click)="navigateToEditEvent()"
+    >
+      Edit
+    </button>
+    <div *ngIf="rsvpsError" class="error">{{ rsvpsError }}</div>
+  </div>
+
 </div>

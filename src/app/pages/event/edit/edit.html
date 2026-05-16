@@ -1,0 +1,88 @@
+<div class="edit-event-container">
+  <div class="edit-event-card">
+    <h1 class="edit-title">Edit Event</h1>
+
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="success" class="success">{{ success }}</div>
+
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          id="name"
+          class="form-control"
+          formControlName="name"
+          [class.is-invalid]="submitted && f['name'].errors"
+        />
+        <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">Name is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          rows="4"
+          class="form-control"
+          formControlName="description"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="start_time">Start Time</label>
+        <input
+          id="start_time"
+          type="datetime-local"
+          class="form-control"
+          formControlName="start_time"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="end_time">End Time</label>
+        <input
+          id="end_time"
+          type="datetime-local"
+          class="form-control"
+          formControlName="end_time"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="place">Place</label>
+        <input id="place" class="form-control" formControlName="place" />
+      </div>
+
+      <div class="form-group">
+        <label for="organizer_group_id">Organizer Group</label>
+        <select
+          id="organizer_group_id"
+          class="form-control"
+          formControlName="organizer_group_id"
+          (change)="onOrganizerGroupChange($event)"
+        >
+          <option value="">Select group</option>
+          <option *ngFor="let g of organizerGroups" [value]="g.id">
+            {{ g.display_name ?? g.name }}
+          </option>
+          <option value="create-new">Create new…</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        {{ loading ? 'Saving...' : 'Save Changes' }}
+      </button>
+      <button
+        *ngIf="eventId"
+        type="button"
+        class="btn btn-danger"
+        [disabled]="loading"
+        (click)="cancelEvent()"
+        style="margin-left: 0.5rem"
+      >
+        Cancel Event
+      </button>
+    </form>
+
+    <p class="back-link"><a routerLink="/dashboard">Back to dashboard</a></p>
+  </div>
+</div>

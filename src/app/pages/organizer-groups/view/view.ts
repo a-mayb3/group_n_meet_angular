@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
 import { GroupResolver } from '../../../resolvers/group.resolver';
 import { ApiService } from '../../../services/api.service';
+import { AuthService } from '../../../services/auth.service';
 import { EventsList } from '../../../events-list/events-list';
 
 @Component({
@@ -17,6 +18,7 @@ export class OrganizerGroupPageComponent implements OnInit {
   group: any | null = null;
   loading = false;
   error = '';
+  currentUserIsGroupMember = false;
 
   events: any[] = [];
 
@@ -34,9 +36,15 @@ export class OrganizerGroupPageComponent implements OnInit {
     private groupResolver: GroupResolver,
     private api: ApiService,
     private router: Router,
+    private auth: AuthService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
+    this.auth.currentUser$.subscribe(() => {
+      this.refreshCurrentUserMembership();
+    });
+
     const navGroup =
       (this.router.getCurrentNavigation && this.router.getCurrentNavigation())?.extras?.state?.[
         'group'
@@ -55,6 +63,7 @@ export class OrganizerGroupPageComponent implements OnInit {
       if (Array.isArray((this.group as any)?.events)) {
         this.events = (this.group as any).events;
       }
+      this.refreshCurrentUserMembership();
       return;
     }
 
@@ -73,9 +82,43 @@ export class OrganizerGroupPageComponent implements OnInit {
       if (Array.isArray((this.group as any)?.events)) {
         this.events = (this.group as any).events;
       }
+      this.refreshCurrentUserMembership();
     } else {
       this.error = 'Failed to load organizer group';
+      this.currentUserIsGroupMember = false;
     }
+  }
+
+  private refreshCurrentUserMembership(): void {
+    if (!this.group) {
+      this.currentUserIsGroupMember = false;
+      return;
+    }
+
+    this.auth.isCurrentUserMemberOfOrgGroup(this.group).subscribe({
+      next: (isMember) => {
+        this.currentUserIsGroupMember = isMember;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.currentUserIsGroupMember = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  navigateToEditGroup(): void {
+    if (!this.group) return;
+
+    this.router.navigate(
+      ['/organizer-groups', String(this.group.id ?? this.group.pk ?? this.group._id), 'edit'],
+      {
+        state: {
+          group: this.group,
+          mode: 'edit',
+        },
+      },
+    );
   }
 
   private loadGroup(id: string): void {

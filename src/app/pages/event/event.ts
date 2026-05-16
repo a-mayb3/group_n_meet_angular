@@ -7,6 +7,7 @@ import { from, of } from 'rxjs';
 import { concatMap, map, catchError, filter, take, defaultIfEmpty } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { GroupResolver } from '../../resolvers/group.resolver';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-event-page',
@@ -27,16 +28,26 @@ export class EventPageComponent implements OnInit {
   rsvpsLoading = false;
   rsvpsError = '';
   reservationLoading = false;
+  currentUserOwnsEvent = false;
 
   constructor(
     private route: ActivatedRoute,
     private api: ApiService,
     private router: Router,
     private groupResolver: GroupResolver,
+    private auth: AuthService,
     private cdr: ChangeDetectorRef,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
+    // Set up current user subscription FIRST so it's always active
+    this.auth.currentUser$.subscribe((user) => {
+      // eslint-disable-next-line no-console
+      console.log('[EVENT] Current user updated:', user);
+      this.updateCurrentUserOwnership();
+      this.cdr.detectChanges();
+    });
+
     // If navigation included the event object in state, use it and avoid refetch
     const navEvent =
       (this.router.getCurrentNavigation && this.router.getCurrentNavigation())?.extras?.state?.[
@@ -48,6 +59,8 @@ export class EventPageComponent implements OnInit {
       this.navStateUsed = true;
       this.lastResponse = navEvent;
       this.applyResolvedRsvps((this.route.snapshot.data as any)?.['rsvps']);
+      this.updateCurrentUserOwnership();
+      this.cdr.detectChanges();
       return;
     }
 
@@ -58,6 +71,8 @@ export class EventPageComponent implements OnInit {
       this.loading = false;
       this.lastResponse = resolved;
       this.applyResolvedRsvps((this.route.snapshot.data as any)?.['rsvps']);
+      this.updateCurrentUserOwnership();
+      this.cdr.detectChanges();
       return;
     }
 
@@ -112,17 +127,24 @@ export class EventPageComponent implements OnInit {
           this.event = null;
           this.loading = false;
           this.error = `Event ${id} not found`;
+          this.cdr.detectChanges();
           return;
         }
 
         const payloadObj = Array.isArray(payload) ? (payload[0] ?? null) : (payload ?? null);
         this.event = payloadObj;
         this.loading = false;
+        // eslint-disable-next-line no-console
+        console.log('[EVENT] Loaded event:', this.event);
+        this.updateCurrentUserOwnership();
+        this.cdr.detectChanges();
         if (this.event) this.resolveOrganizerNameIfNeeded(this.event);
       },
       error: (err) => {
+        // eslint-disable-next-line no-console
         console.warn('Event lookup failed', err?.status, err);
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -273,5 +295,51 @@ export class EventPageComponent implements OnInit {
     if (gid) {
       this.router.navigate(['/org', String(gid)]);
     }
+  }
+
+  navigateToEditEvent(): void {
+    if (!this.event) return;
+    const id = this.currentEventId;
+    if (!id) return;
+    this.router.navigate(['/event', String(id), 'edit'], {
+      state: { event: this.event, mode: 'edit' },
+    });
+  }
+
+  private updateCurrentUserOwnership(): void {
+    if (!this.event) {
+      // eslint-disable-next-line no-console
+      console.log('[EVENT] No event set yet, skipping ownership check');
+      return;
+    }
+
+    const currentUser = (this.auth as any).currentUserSubject?.getValue?.() ?? null;
+    if (!currentUser) {
+      // eslint-disable-next-line no-console
+      console.log('[EVENT] No current user set yet, skipping ownership check');
+      return;
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('[EVENT] Checking ownership (async):', {
+      event: this.event,
+      currentUser: currentUser,
+    });
+
+    // Use async ownership check that fetches org group data
+    this.auth.ownsEventThroughOrgGroupsAsync(this.event, currentUser).subscribe({
+      next: (owns) => {
+        // eslint-disable-next-line no-console
+        console.log('[EVENT] Async ownership result:', owns);
+        this.currentUserOwnsEvent = owns;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        // eslint-disable-next-line no-console
+        console.error('[EVENT] Ownership check failed:', err);
+        this.currentUserOwnsEvent = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 }

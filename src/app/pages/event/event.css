@@ -16,14 +16,15 @@
 .event-description {
   margin-bottom: 1rem;
 }
+
 .event-actions {
   margin: 0.5rem 0 1rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
 }
 
-.reservation-button {
+.event-actions > * {
   align-self: flex-start;
   padding: 0.6rem 1rem;
   border: 1px solid #333;

@@ -11,6 +11,15 @@
     </p>
 
     <div *ngIf="group.description" class="group-description">{{ group.description }}</div>
+
+    <button
+      *ngIf="currentUserIsGroupMember"
+      type="button"
+      class="edit-button"
+      (click)="navigateToEditGroup()"
+    >
+      Edit
+    </button>
   </section>
 
   <app-events-list
