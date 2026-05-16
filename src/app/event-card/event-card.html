@@ -1,11 +1,11 @@
 <article
   class="event-card"
-  role="button"
-  tabindex="0"
-  [attr.aria-label]="'Open event ' + title"
+  [attr.role]="id ? 'button' : null"
+  [attr.tabindex]="id ? 0 : null"
+  [attr.aria-label]="id ? ('Open event ' + title) : null"
   (click)="id && activate($event)"
   (keydown.enter)="id && activate($event)"
-  (keydown.space)="id && activate($event)"
+  (keydown.space)="$event.preventDefault(); id && activate($event)"
 >
   <ng-container *ngIf="!isRsvpCard; else rsvpCard">
     <h3 class="event-title">{{ title }}</h3>
@@ -13,9 +13,9 @@
     <p *ngIf="description" class="event-description">{{ description }}</p>
 
     <div class="event-meta">
-      <small *ngIf="event?.starts_at || event?.start_time"
-        >Starts: {{ event.starts_at ?? event.start_time }}</small
-      >
+      <small *ngIf="event?.starts_at || event?.start_time">
+        Starts: {{ event.starts_at ?? event.start_time }}
+      </small>
       <small *ngIf="event?.location"> • {{ event.location }}</small>
     </div>
   </ng-container>

@@ -21,20 +21,17 @@ export class EventCard {
 
   get title(): string {
     if (this.isRsvpCard) {
-      return `Event: ${this.rsvp?.event_id ?? 'Unknown event'}`;
+      return (
+        this.event?.name ?? `Event: ${this.rsvp?.event_id}`
+      );
     }
 
-    return this.event?.title ?? this.event?.name ?? this.event?.event_title ?? 'Untitled Event';
+    return this.event?.name;
   }
 
-  get id(): string | null {
+  get id(): string{
     return (
-      this.event?.id ??
-      this.event?.pk ??
-      this.event?._id ??
-      this.event?.slug ??
-      this.rsvp?.event_id ??
-      null
+      this.event?.id
     );
   }
 
@@ -50,18 +47,14 @@ export class EventCard {
     return this.rsvp?.reserved_at ?? null;
   }
 
-  open(e: MouseEvent): void {
-    e.preventDefault();
+  open(): void {
     const id = this.id;
     if (!id) return;
     this.router.navigate(['/event', id], { state: { event: this.event } });
   }
 
-  activate(event: MouseEvent | KeyboardEvent): void {
-    if (event instanceof KeyboardEvent) {
-      event.preventDefault();
-    }
-
-    this.open(event as MouseEvent);
+  activate(event: Event): void {
+    event.preventDefault();
+    this.open();
   }
 }

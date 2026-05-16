@@ -5,13 +5,12 @@ import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserBase } from '../../models/user.model';
-
-import { EventCard } from '../../event-card/event-card';
+import { RsvpCardComponent } from '../../rsvp-card/rsvp-card';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, EventCard],
+  imports: [CommonModule, RsvpCardComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
 })

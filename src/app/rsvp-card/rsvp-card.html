@@ -1,0 +1,15 @@
+<article *ngIf="!rsvp.is_cancelled"
+  class="rsvp-card"
+  [attr.role]="eventId ? 'button' : null"
+  [attr.tabindex]="eventId ? 0 : null"
+  [attr.aria-label]="eventId ? 'Open event ' + title : null"
+  (click)="eventId && activate($event)"
+  (keydown.enter)="eventId && activate($event)"
+  (keydown.space)="$event.preventDefault(); eventId && activate($event)"
+>
+  <h3 class="rsvp-title">{{ title }}</h3>
+
+  <div class="rsvp-meta">
+    <small *ngIf="reservedAt">Reserved: {{ reservedAt | date: 'medium' }}</small>
+  </div>
+</article>

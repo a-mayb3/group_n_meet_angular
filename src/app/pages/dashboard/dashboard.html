@@ -15,7 +15,10 @@
     <div *ngIf="rsvpsError" class="error">{{ rsvpsError }}</div>
     <div *ngIf="rsvps && rsvps.length; else noRsvps">
       <div class="rsvp-list">
-        <app-event-card *ngFor="let rsvp of rsvps" [rsvp]="rsvp"></app-event-card>
+        <app-rsvp-card
+          *ngFor="let rsvp of rsvps.filter((e) => !e.is_cancelled)"
+          [rsvp]="rsvp"
+        ></app-rsvp-card>
       </div>
     </div>
   </section>
