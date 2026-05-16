@@ -5,13 +5,13 @@
   <section *ngIf="!loading && group" class="group-detail">
     <h1 class="group-name">{{ group.display_name ?? group.name ?? 'Organizer Group' }}</h1>
 
-    <p class="group-meta">
-      <small *ngIf="group.id">ID: {{ group.id }}</small>
-      <small *ngIf="group.created"> • Created: {{ group.created }}</small>
-    </p>
-
     <div *ngIf="group.description" class="group-description">{{ group.description }}</div>
-
+    <ul class="group-meta">
+      <li *ngIf="group.id">ID: {{ group.id }}</li>
+      <li *ngIf="group.created">Created: {{ group.created }}</li>
+    </ul>
+  </section>
+  <section class="actions">
     <button
       *ngIf="currentUserIsGroupMember"
       type="button"
@@ -19,6 +19,16 @@
       (click)="navigateToEditGroup()"
     >
       Edit
+    </button>
+
+    <button
+      *ngIf="currentUserIsGroupMember"
+      type="button"
+      class="leave-button"
+      (click)="leaveGroup()"
+      [disabled]="leaving"
+    >
+      {{ leaving ? 'Leaving...' : 'Leave Group' }}
     </button>
   </section>
 

@@ -17,6 +17,7 @@ import { EventsList } from '../../../events-list/events-list';
 export class OrganizerGroupPageComponent implements OnInit {
   group: any | null = null;
   loading = false;
+  leaving = false;
   error = '';
   currentUserIsGroupMember = false;
 
@@ -119,6 +120,40 @@ export class OrganizerGroupPageComponent implements OnInit {
         },
       },
     );
+  }
+
+  leaveGroup(): void {
+    if (!this.group || this.leaving) return;
+
+    const groupId = String(this.group.id ?? this.group.pk ?? this.group._id ?? '');
+    if (!groupId) return;
+
+    const confirmed = window.confirm('Leave this organizer group?');
+    if (!confirmed) return;
+
+    this.leaving = true;
+    this.error = '';
+
+    this.api.delete<any>(`/org/${groupId}/leave`).subscribe({
+      next: () => {
+        this.leaving = false;
+        this.currentUserIsGroupMember = false;
+        this.cdr.detectChanges();
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: (err) => {
+        this.leaving = false;
+        this.cdr.detectChanges();
+        const message =
+          err?.status === 400
+            ? err?.error?.message ||
+              err?.error?.detail ||
+              'You cannot leave this group while more than one user remains. Delete the group instead.'
+            : err?.error?.message || 'Failed to leave organizer group';
+
+        window.alert(message);
+      },
+    });
   }
 
   private loadGroup(id: string): void {

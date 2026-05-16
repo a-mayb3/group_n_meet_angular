@@ -15,6 +15,7 @@ import { OrganizerGroupBase } from '../../../models/organizer-group.model';
 export class EditOrganizerGroupComponent implements OnInit {
   groupForm!: FormGroup;
   loading = false;
+  deleting = false;
   submitted = false;
   error = '';
   success = '';
@@ -39,8 +40,7 @@ export class EditOrganizerGroupComponent implements OnInit {
     const navGroup = (window.history.state as any)?.group ?? null;
     this.group = resolvedGroup ?? navGroup ?? null;
 
-    const id =
-      this.group?.id ?? this.route.snapshot.paramMap.get('id');
+    const id = this.group?.id ?? this.route.snapshot.paramMap.get('id');
     this.groupId = id ? String(id) : null;
 
     if (this.group) {
@@ -82,6 +82,36 @@ export class EditOrganizerGroupComponent implements OnInit {
       error: (err) => {
         this.loading = false;
         this.error = err?.error?.message || 'Failed to update organizer group';
+      },
+    });
+  }
+
+  deleteGroup(): void {
+    this.error = '';
+    this.success = '';
+
+    if (!this.groupId || this.deleting) return;
+
+    const confirmed = window.confirm('Delete this organizer group? This action cannot be undone.');
+    if (!confirmed) return;
+
+    this.deleting = true;
+    this.api.delete<any>(`/org/${this.groupId}/`).subscribe({
+      next: () => {
+        this.deleting = false;
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: (err) => {
+        this.deleting = false;
+        if (err?.status === 400) {
+          this.error =
+            err?.error?.message ||
+            err?.error?.detail ||
+            'This group cannot be deleted until only one user remains.';
+          return;
+        }
+
+        this.error = err?.error?.message || 'Failed to delete organizer group';
       },
     });
   }

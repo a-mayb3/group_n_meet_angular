@@ -5,8 +5,14 @@
   --form-label-color: #333;
 
   --background-color: #f9f9f9;
+  --error-background-color: #f8d7da;
+
   --primary-color: #667eea;
+  
   --primary-text-color: black;
+  --not-found-text-color: #7c7c7c;
+  --error-text-color: #721c24;
+
 }
 
 body {
@@ -21,11 +27,27 @@ textarea {
   resize: vertical;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   background-color: transparent;
 }
 
-input, select, textarea, button {
+input,
+select,
+textarea,
+button {
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--border-color);
   border-radius: 0;
+}
+
+.loading,
+.error {
+  margin: 0.5rem 0;
+}
+
+.not-found {
+  color: var(--not-found-text-color);
+  font-style: italic;
 }

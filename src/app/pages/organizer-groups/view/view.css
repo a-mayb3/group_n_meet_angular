@@ -1,9 +1,4 @@
-.group-page {
-  padding: 3rem;
-}
-
 .group-detail {
-  background: white;
   margin-bottom: 2rem;
 }
 
@@ -11,16 +6,40 @@
   margin: 0 0 0.5rem 0;
 }
 
-.group-meta {
+.group-meta ul{
+  display: flex;
+  flex: column;
+}
+
+.group-meta li {
+  list-style: none;
+  list-style-type: none;
+
   color: #666;
-  margin-bottom: 1rem;
+  font-size: 0.75rem;
+
 }
 
 .group-description {
   margin-bottom: 1rem;
 }
 
-.loading,
-.error {
-  margin: 0.5rem 0;
+.leave-button {
+  background-color: #dc3545;
+  color: #fff;
+  cursor: pointer;
+}
+
+.leave-button:hover:not(:disabled) {
+  background-color: #bb2d3b;
+}
+
+.leave-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
 }

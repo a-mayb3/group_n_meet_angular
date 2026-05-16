@@ -1,6 +1,5 @@
 nav {
   margin: 0;
-  margin-bottom: 0.5rem;
 
   min-height: 3rem;
   height: min-content;
@@ -12,6 +11,7 @@ nav {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  
   padding: 0 0.75rem;
   gap: 0.5rem;
 }
@@ -34,18 +34,6 @@ nav {
   align-items: center;
   flex: 1 1 auto;
   justify-content: center;
-}
-
-.navbar-search-form input {
-  padding: 0.4rem 0.6rem;
-  border: 1px solid var(--border-color);
-  border-radius: 0;
-}
-
-.navbar-search-form button {
-  padding: 0.4rem 0.6rem;
-  border: 1px solid var(--border-color);
-  border-radius: 0;
 }
 
 /* User menu styles */

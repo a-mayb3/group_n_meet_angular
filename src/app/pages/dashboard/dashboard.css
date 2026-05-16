@@ -1,8 +1,9 @@
-.dashboard {
-  padding: 2rem;
-}
 .dashboard h1 {
   margin: 0 0 1rem;
+}
+
+section.user_greeting_section {
+  margin-bottom: 2rem;
 }
 
 .welcome_user {

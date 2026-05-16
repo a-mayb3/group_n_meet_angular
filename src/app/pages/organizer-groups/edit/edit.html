@@ -32,6 +32,15 @@
       <button type="submit" class="btn btn-primary" [disabled]="loading">
         {{ loading ? 'Saving...' : 'Save Changes' }}
       </button>
+
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="deleteGroup()"
+        [disabled]="deleting || loading"
+      >
+        {{ deleting ? 'Deleting...' : 'Delete Group' }}
+      </button>
     </form>
 
     <p class="back-link"><a routerLink="/dashboard">Back to dashboard</a></p>
