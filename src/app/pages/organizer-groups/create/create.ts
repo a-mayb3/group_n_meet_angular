@@ -5,19 +5,23 @@ import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 
 @Component({
-  selector: 'app-add-organizer-group',
+  selector: 'app-create-organizer-group',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './add.html',
-  styleUrls: ['./add.css'],
+  templateUrl: './create.html',
+  styleUrls: ['./create.css'],
 })
-export class AddOrganizerGroupComponent implements OnInit {
+export class CreateOrganizerGroupComponent implements OnInit {
   groupForm!: FormGroup;
   loading = false;
   submitted = false;
   error = '';
 
-  constructor(private fb: FormBuilder, private api: ApiService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private api: ApiService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.groupForm = this.fb.group({

@@ -5,16 +5,16 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { timeout } from 'rxjs/operators';
 import { from, of } from 'rxjs';
 import { concatMap, map, catchError, filter, take, defaultIfEmpty } from 'rxjs/operators';
-import { ApiService } from '../../services/api.service';
-import { GroupResolver } from '../../resolvers/group.resolver';
-import { AuthService } from '../../services/auth.service';
+import { ApiService } from '../../../services/api.service';
+import { GroupResolver } from '../../../resolvers/group.resolver';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-event-page',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './event.html',
-  styleUrls: ['./event.css'],
+  templateUrl: './view.html',
+  styleUrls: ['./view.css'],
 })
 export class EventPageComponent implements OnInit {
   event: any | null = null;

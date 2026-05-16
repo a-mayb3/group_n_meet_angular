@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
-import { AddOrganizerGroupComponent } from './pages/organizer-groups/add/add';
+import { CreateOrganizerGroupComponent } from './pages/organizer-groups/create/create';
 import { EditOrganizerGroupComponent } from './pages/organizer-groups/edit/edit';
 import { CreateEventComponent } from './pages/event/create/create';
 import { EditEventComponent } from './pages/event/edit/edit';
@@ -10,7 +10,7 @@ import { OrganizerGroupPageComponent } from './pages/organizer-groups/view/view'
 import { GroupResolver } from './resolvers/group.resolver';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { AuthGuard } from './guards/auth.guard';
-import { EventPageComponent } from './pages/event/event';
+import { EventPageComponent } from './pages/event/view/view';
 import { SearchResolver } from './resolvers/search.resolver';
 import { DashboardResolver } from './resolvers/dashboard.resolver';
 import { EventResolver } from './resolvers/event.resolver';
@@ -22,7 +22,11 @@ import { RsvpsPageComponent } from './pages/rsvps/rsvps';
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'organizer-groups/new', component: AddOrganizerGroupComponent, canActivate: [AuthGuard] },
+  {
+    path: 'organizer-groups/new',
+    component: CreateOrganizerGroupComponent,
+    canActivate: [AuthGuard],
+  },
   {
     path: 'organizer-groups/:id/edit',
     component: EditOrganizerGroupComponent,

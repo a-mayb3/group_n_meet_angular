@@ -3,7 +3,6 @@
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <article *ngIf="!loading && event" class="event-detail">
-    
     <h1 class="event-title">
       {{ event.title ?? event.name ?? event.event_title }}
     </h1>
@@ -37,7 +36,6 @@
     </div>
   </article>
   <div class="event-actions">
-      
     <button
       type="button"
       class="reservation-button"
@@ -56,5 +54,4 @@
     </button>
     <div *ngIf="rsvpsError" class="error">{{ rsvpsError }}</div>
   </div>
-
 </div>
