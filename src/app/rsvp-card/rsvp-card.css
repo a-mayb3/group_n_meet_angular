@@ -8,12 +8,6 @@
   transform: translateY(1px);
 }
 
-.rsvp-card:hover,
-.rsvp-card:focus {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
-
 .rsvp-title {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;

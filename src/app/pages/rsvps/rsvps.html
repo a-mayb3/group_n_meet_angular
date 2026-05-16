@@ -5,7 +5,7 @@
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <div *ngIf="!loading && filteredRsvps.length; else noRsvps" class="rsvp-list">
-    <app-event-card *ngFor="let rsvp of filteredRsvps" [rsvp]="rsvp"></app-event-card>
+    <app-rsvp-card *ngFor="let rsvp of filteredRsvps" [rsvp]="rsvp"></app-rsvp-card>
   </div>
 
   <ng-template #noRsvps>

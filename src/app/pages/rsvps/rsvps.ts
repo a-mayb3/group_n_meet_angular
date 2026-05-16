@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
 import { timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
-import { EventCard } from '../../event-card/event-card';
+import { RsvpCardComponent } from '../../rsvp-card/rsvp-card';
 
 @Component({
   selector: 'app-rsvps-page',
   standalone: true,
-  imports: [CommonModule, EventCard],
+  imports: [CommonModule, RsvpCardComponent],
   templateUrl: './rsvps.html',
   styleUrls: ['./rsvps.css'],
 })
