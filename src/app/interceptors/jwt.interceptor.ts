@@ -23,6 +23,9 @@ export class JwtInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
+          if (this.isAuthEndpoint(request.url)) {
+            return throwError(() => error);
+          }
           return this.handle401Error(request, next);
         } else {
           return throwError(() => error);
@@ -61,5 +64,13 @@ export class JwtInterceptor implements HttpInterceptor {
         }),
       );
     }
+  }
+
+  private isAuthEndpoint(url: string): boolean {
+    return (
+      url.includes('/auth/login') ||
+      url.includes('/auth/register') ||
+      url.includes('/auth/logout')
+    );
   }
 }

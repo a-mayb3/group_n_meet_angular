@@ -38,4 +38,14 @@
     title="Events by this organizer"
     emptyMessage="No events"
   ></app-events-list>
+
+  <section *ngIf="!loading && group" class="group-members">
+    <h2>Members</h2>
+    <div *ngIf="groupMembers.length; else noMembers" class="member-list">
+      <app-member-card *ngFor="let m of groupMembers" [member]="m"></app-member-card>
+    </div>
+    <ng-template #noMembers>
+      <div class="empty not-found">No members listed for this group</div>
+    </ng-template>
+  </section>
 </div>

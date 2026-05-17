@@ -1,0 +1,14 @@
+<article
+  class="member-card"
+  [attr.role]="id ? 'button' : null"
+  [attr.tabindex]="id ? 0 : null"
+  [attr.aria-label]="id ? 'Open profile for ' + name : null"
+  (click)="id && activate($event)"
+  (keydown.enter)="id && activate($event)"
+  (keydown.space)="$event.preventDefault(); id && activate($event)"
+>
+  <h4 class="member-name">{{ name }}</h4>
+  <div class="member-meta">
+    <small *ngIf="email">{{ email }}</small>
+  </div>
+</article>

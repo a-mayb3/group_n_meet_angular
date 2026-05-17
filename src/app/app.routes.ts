@@ -3,6 +3,7 @@ import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { CreateOrganizerGroupComponent } from './pages/organizer-groups/create/create';
 import { EditOrganizerGroupComponent } from './pages/organizer-groups/edit/edit';
+import { MyOrganizerGroupsComponent } from './pages/organizer-groups/my-organizer-groups';
 import { CreateEventComponent } from './pages/event/create/create';
 import { EditEventComponent } from './pages/event/edit/edit';
 import { SearchResultsComponent } from './pages/search-results/search-results';
@@ -25,6 +26,11 @@ export const routes: Routes = [
   {
     path: 'organizer-groups/new',
     component: CreateOrganizerGroupComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'organizer-groups',
+    component: MyOrganizerGroupsComponent,
     canActivate: [AuthGuard],
   },
   {

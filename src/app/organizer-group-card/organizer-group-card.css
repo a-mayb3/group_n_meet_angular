@@ -4,10 +4,6 @@
   cursor: pointer;
 }
 
-.org-card:active {
-  transform: translateY(1px);
-}
-
 .org-title {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;

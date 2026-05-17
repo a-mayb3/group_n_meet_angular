@@ -34,8 +34,6 @@ export class OrganizerGroupCardComponent {
 
   get membersCount(): number | null {
     if (Array.isArray(this.group?.members)) return this.group.members.length;
-    if (Array.isArray(this.group?.group_members)) return this.group.group_members.length;
-    if (Array.isArray(this.group?.member_ids)) return this.group.member_ids.length;
     return null;
   }
 

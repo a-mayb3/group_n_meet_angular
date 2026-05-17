@@ -1,0 +1,19 @@
+.org-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  width: 100%;
+}
+
+.loading {
+  color: #666;
+}
+
+.error {
+  color: #b00020;
+}
+.empty {
+  color: #666;
+}
+
+  padding: 1rem;

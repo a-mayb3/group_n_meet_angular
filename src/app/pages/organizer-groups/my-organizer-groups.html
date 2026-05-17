@@ -1,0 +1,14 @@
+<div class="orgs-page">
+  <h1>My Organizer Groups</h1>
+
+  <div *ngIf="loading" class="loading">Loading your organizer groups…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!loading && hasOrgs; else noOrgs" class="org-list">
+    <app-organizer-group-card *ngFor="let org of orgs" [group]="org"></app-organizer-group-card>
+  </div>
+
+  <ng-template #noOrgs>
+    <div class="empty not-found">No organizer groups found</div>
+  </ng-template>
+</div>

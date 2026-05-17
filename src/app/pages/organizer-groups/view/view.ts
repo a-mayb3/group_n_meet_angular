@@ -6,11 +6,12 @@ import { GroupResolver } from '../../../resolvers/group.resolver';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
 import { EventsList } from '../../../events-list/events-list';
+import { MemberCardComponent } from '../../../member-card/member-card';
 
 @Component({
   selector: 'app-organizer-group-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, EventsList],
+  imports: [CommonModule, RouterModule, EventsList, MemberCardComponent],
   templateUrl: './view.html',
   styleUrls: ['./view.css'],
 })
@@ -22,6 +23,11 @@ export class OrganizerGroupPageComponent implements OnInit {
   currentUserIsGroupMember = false;
 
   events: any[] = [];
+
+  get groupMembers(): any[] {
+    if (!this.group) return [];
+    return this.normalizeMembers(this.group.members);
+  }
 
   lastAttemptedEndpoint = '';
   lastResponse: any = null;
@@ -45,28 +51,6 @@ export class OrganizerGroupPageComponent implements OnInit {
     this.auth.currentUser$.subscribe(() => {
       this.refreshCurrentUserMembership();
     });
-
-    const navGroup =
-      (this.router.getCurrentNavigation && this.router.getCurrentNavigation())?.extras?.state?.[
-        'group'
-      ] ?? (window.history.state as any)?.group;
-
-    if (navGroup) {
-      this.group = navGroup;
-      this.loading = false;
-      this.navStateUsed = true;
-      this.lastResponse = navGroup;
-      const gid = this.group?.id ?? this.group?.pk ?? this.group?._id ?? null;
-      if (gid) {
-        this.lastLoadedGroupId = String(gid);
-      }
-      // Use resolver-provided events (including empty array if no events)
-      if (Array.isArray((this.group as any)?.events)) {
-        this.events = (this.group as any).events;
-      }
-      this.refreshCurrentUserMembership();
-      return;
-    }
 
     // Always trust the resolver for data loading
     const resolved = (this.route.snapshot && (this.route.snapshot.data as any)?.group) ?? null;
@@ -106,6 +90,30 @@ export class OrganizerGroupPageComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  private normalizeMembers(members: unknown): any[] {
+    if (Array.isArray(members)) {
+      return members;
+    }
+
+    if (typeof members === 'string' && members.trim()) {
+      try {
+        const parsed = JSON.parse(members);
+        return Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+      } catch {
+        return [];
+      }
+    }
+
+    if (members && typeof members === 'object') {
+      const maybeObject = members as any;
+      if (Array.isArray(maybeObject.results)) return maybeObject.results;
+      if (Array.isArray(maybeObject.items)) return maybeObject.items;
+      return [maybeObject];
+    }
+
+    return [];
   }
 
   navigateToEditGroup(): void {

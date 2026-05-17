@@ -43,13 +43,15 @@ export class UserMenu {
     }
   }
 
-  // TODO: implement these methods
 
   navigateToMyReservations(): void {
     this.showMenu = false;
     this.router.navigate(['/rsvps']);
   }
-  navigateToMyOrganizerGroups(): void {}
+  navigateToMyOrganizerGroups(): void {
+    this.showMenu = false;
+    this.router.navigate(['/organizer-groups']);
+  }
 
   navigateToAddEvent(): void {
     this.showMenu = false;
