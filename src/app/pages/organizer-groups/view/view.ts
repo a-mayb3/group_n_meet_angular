@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-import { timeout } from 'rxjs/operators';
+import { timeout, take } from 'rxjs/operators';
 import { GroupResolver } from '../../../resolvers/group.resolver';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
@@ -19,6 +19,7 @@ export class OrganizerGroupPageComponent implements OnInit {
   group: any | null = null;
   loading = false;
   leaving = false;
+  joining = false;
   error = '';
   currentUserIsGroupMember = false;
 
@@ -160,6 +161,54 @@ export class OrganizerGroupPageComponent implements OnInit {
             : err?.error?.message || 'Failed to leave organizer group';
 
         window.alert(message);
+      },
+    });
+  }
+
+  joinGroup(): void {
+    if (!this.group || this.joining) return;
+
+    const groupId = String(this.group.id ?? this.group.pk ?? this.group._id ?? '');
+    if (!groupId) return;
+
+    this.joining = true;
+    this.error = '';
+
+    this.api.post<any>(`/org/${groupId}/join`, {}).subscribe({
+      next: () => {
+        this.joining = false;
+        this.currentUserIsGroupMember = true;
+
+        this.auth.currentUser$.pipe(take(1)).subscribe((user) => {
+          if (!user) {
+            this.cdr.detectChanges();
+            return;
+          }
+
+          const members = this.groupMembers.slice();
+          const currentUserId = String(
+            (user as any)?.id ?? (user as any)?.pk ?? (user as any)?._id ?? '',
+          );
+          const alreadyIncluded = members.some((member) => {
+            const memberId = String(
+              member?.id ?? member?.pk ?? member?._id ?? member?.user_id ?? '',
+            );
+            return memberId && currentUserId && memberId === currentUserId;
+          });
+
+          if (!alreadyIncluded) {
+            members.push(user);
+            this.group.members = members;
+          }
+
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        this.joining = false;
+        const message = err?.error?.message || 'Failed to join organizer group';
+        window.alert(message);
+        this.cdr.detectChanges();
       },
     });
   }

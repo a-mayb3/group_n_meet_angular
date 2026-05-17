@@ -6,7 +6,7 @@
   margin: 0 0 0.5rem 0;
 }
 
-.group-meta ul{
+.group-meta ul {
   display: flex;
   flex: column;
 }
@@ -17,11 +17,16 @@
 
   color: #666;
   font-size: 0.75rem;
-
 }
 
 .group-description {
   margin-bottom: 1rem;
+}
+
+.member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .leave-button {
@@ -35,6 +40,21 @@
 }
 
 .leave-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.join-button {
+  background-color: #198754;
+  color: #fff;
+  cursor: pointer;
+}
+
+.join-button:hover:not(:disabled) {
+  background-color: #157347;
+}
+
+.join-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

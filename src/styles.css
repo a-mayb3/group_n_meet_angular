@@ -10,6 +10,7 @@
   --primary-color: #667eea;
   
   --primary-text-color: black;
+  --meta-text-color: #666;
   --not-found-text-color: #7c7c7c;
   --error-text-color: #721c24;
 
@@ -50,4 +51,16 @@ button {
 .not-found {
   color: var(--not-found-text-color);
   font-style: italic;
+}
+
+.meta{
+  color: var(--meta-text-color);
+
+  list-style: none;
+  list-style-type: none;
+  margin-bottom: 0.5rem;
+
+  font-weight: light;
+  font-style: italic;
+  font-size: .75rem;
 }

@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-import { timeout } from 'rxjs/operators';
+import { timeout, take } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -16,6 +17,8 @@ export class ProfilePageComponent implements OnInit {
   loading = false;
   error = '';
 
+  isOwnProfile = false;
+
   lastAttemptedEndpoint = '';
   lastResponse: any = null;
   lastError: any = null;
@@ -25,6 +28,8 @@ export class ProfilePageComponent implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private router: Router,
+    private auth: AuthService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -38,6 +43,7 @@ export class ProfilePageComponent implements OnInit {
       this.loading = false;
       this.navStateUsed = true;
       this.lastResponse = navProfile;
+      this.updateIsOwnProfile();
       return;
     }
 
@@ -47,8 +53,12 @@ export class ProfilePageComponent implements OnInit {
       this.profile = resolved;
       this.loading = false;
       this.lastResponse = resolved;
+      this.updateIsOwnProfile();
       return;
     }
+
+    // keep ownership state in sync when current user changes
+    this.auth.currentUser$.subscribe(() => this.updateIsOwnProfile());
 
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
@@ -59,6 +69,30 @@ export class ProfilePageComponent implements OnInit {
       }
       this.loadProfile(id);
     });
+  }
+
+  private updateIsOwnProfile(): void {
+    if (!this.profile) {
+      this.isOwnProfile = false;
+      this.cdr.detectChanges();
+      return;
+    }
+    this.auth.currentUser$.pipe(take(1)).subscribe((user) => {
+      const currentId = user?.id;
+      const profileId = this.profile?.id;
+      this.isOwnProfile = !!(
+        currentId != null &&
+        profileId != null &&
+        String(currentId) === String(profileId)
+      );
+      this.cdr.detectChanges();
+    });
+  }
+
+  onEdit(): void {
+    if (!this.profile) return;
+    const id = this.profile?.id ?? this.profile?.pk ?? this.profile?._id ?? 'me';
+    this.router.navigate(['profile', id, 'edit']);
   }
 
   private loadProfile(id: string): void {
@@ -83,6 +117,7 @@ export class ProfilePageComponent implements OnInit {
               this.profile = payload ?? null;
             }
             this.loading = false;
+            this.updateIsOwnProfile();
           },
           error: (err) => {
             // try fallback if provided
@@ -131,6 +166,7 @@ export class ProfilePageComponent implements OnInit {
                         this.profile = null;
                       }
                       this.loading = false;
+                      this.updateIsOwnProfile();
                     },
                     error: (err) => {
                       // eslint-disable-next-line no-console

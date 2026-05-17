@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -23,6 +23,7 @@ export class CreateEventComponent implements OnInit {
     private fb: FormBuilder,
     private api: ApiService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -54,10 +55,12 @@ export class CreateEventComponent implements OnInit {
         } else if (Array.isArray(payload?.items)) {
           this.organizerGroups = payload.items;
         }
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loadingGroups = false;
         // Silently fail - user can still manually enter group ID if needed
+        this.cdr.detectChanges();
       },
     });
   }
@@ -97,10 +100,12 @@ export class CreateEventComponent implements OnInit {
         } else {
           this.router.navigateByUrl('/dashboard');
         }
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.loading = false;
         this.error = err?.error?.message || 'Failed to create event';
+        this.cdr.detectChanges();
       },
     });
   }

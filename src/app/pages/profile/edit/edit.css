@@ -1,0 +1,38 @@
+.edit-profile-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.edit-form label {
+  display: block;
+  margin-bottom: 12px;
+}
+.edit-form input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+.form-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.form-actions .danger {
+  background: #b00020;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.edit-form .loading {
+  margin-top: 8px;
+}
+.edit-form .error {
+  color: #b00020;
+  margin-top: 8px;
+}
+.edit-form .success {
+  color: #007a3d;
+  margin-top: 8px;
+}

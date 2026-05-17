@@ -18,6 +18,7 @@ import { EventResolver } from './resolvers/event.resolver';
 import { ProfileResolver } from './resolvers/profile.resolver';
 import { RsvpsResolver } from './resolvers/rsvps.resolver';
 import { ProfilePageComponent } from './pages/profile/profile';
+import { EditProfileComponent } from './pages/profile/edit/edit';
 import { RsvpsPageComponent } from './pages/rsvps/rsvps';
 
 export const routes: Routes = [
@@ -56,6 +57,7 @@ export const routes: Routes = [
     component: EventPageComponent,
     resolve: { event: EventResolver, rsvps: RsvpsResolver },
   },
+  { path: 'profile/:id/edit', component: EditProfileComponent, canActivate: [AuthGuard] },
   { path: 'profile/:id', component: ProfilePageComponent, resolve: { profile: ProfileResolver } },
   {
     path: 'rsvps',

@@ -8,15 +8,16 @@
     </h1>
     <div *ngIf="event.description" class="event-description">{{ event.description }}</div>
 
-    <div class="event-meta">
-      <small *ngIf="event.starts_at || event.start_time">
-        Starts: {{ event.starts_at ?? event.start_time | date: 'medium' }}
-      </small>
-      <small *ngIf="event.ends_at || event.end_time">
-        Ends: {{ event.ends_at ?? event.end_time | date: 'medium' }}
-      </small>
-
-      <small *ngIf="event.location"> Where: {{ event.location }} </small>
+    <div class="event-meta meta">
+      <ul>
+      <li *ngIf="event.start_time">
+        Starts: {{ event.start_time | date: 'medium' }}
+      </li>
+      <li *ngIf="event.end_time">
+        Ends: {{ event.end_time | date: 'medium' }}
+      </li>
+      <li *ngIf="event.location"> Where: {{ event.location }} </li>
+      </ul>
       <div
         *ngIf="event && (event.organizer_group_name || event.organizer_group_id || event.group_id)"
         class="organizer-section"

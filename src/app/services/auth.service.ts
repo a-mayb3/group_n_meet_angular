@@ -115,12 +115,14 @@ export class AuthService {
         .subscribe({
           next: (resp) => {
             this.clearTokens();
+            this.currentUserSubject.next(null);
             this.isAuthenticatedSubject.next(false);
             observer.next(resp.body);
             observer.complete();
           },
           error: (error) => {
             this.clearTokens();
+            this.currentUserSubject.next(null);
             this.isAuthenticatedSubject.next(false);
             observer.error(error);
           },

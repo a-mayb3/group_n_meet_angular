@@ -2,21 +2,25 @@
   <div *ngIf="loading" class="loading">Loading profile…</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 
-  <section *ngIf="!loading && profile" class="profile-detail">
+  <article *ngIf="!loading && profile" class="profile-detail">
     <h1 class="profile-name">
       {{ profile.display_name ?? profile.name ?? profile.email_address ?? 'User' }}
     </h1>
 
-    <p class="profile-meta">
-      <small *ngIf="profile.email_address || profile.email"
-        >Email: {{ profile.email_address ?? profile.email }}</small
-      >
-      <small *ngIf="profile.user_type"> • {{ profile.user_type }}</small>
-      <small *ngIf="profile.created"> • Joined: {{ profile.created }}</small>
-    </p>
-
     <div *ngIf="profile.bio || profile.description" class="profile-bio">
       {{ profile.bio ?? profile.description }}
     </div>
-  </section>
+
+    <section class="profile-meta meta">
+      <ul>
+        <li *ngIf="profile.email_address">Email: {{ profile.email_address ?? profile.email }}</li>
+        <li *ngIf="profile.user_type">{{ profile.user_type }}</li>
+        <li *ngIf="profile.created">Joined: {{ profile.created }}</li>
+      </ul>
+    </section>
+
+    <section class="profile-actions">
+      <button *ngIf="isOwnProfile" class="edit-btn" (click)="onEdit()">Edit Profile</button>
+    </section>
+  </article>
 </div>

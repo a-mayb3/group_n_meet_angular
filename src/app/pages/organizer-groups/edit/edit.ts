@@ -103,15 +103,13 @@ export class EditOrganizerGroupComponent implements OnInit {
       },
       error: (err) => {
         this.deleting = false;
-        if (err?.status === 400) {
-          this.error =
-            err?.error?.message ||
-            err?.error?.detail ||
-            'This group cannot be deleted until only one user remains.';
-          return;
-        }
-
-        this.error = err?.error?.message || 'Failed to delete organizer group';
+        const message =
+          err?.error?.message ||
+          err?.error?.detail ||
+          (err?.status === 400
+            ? 'This group cannot be deleted until only one user remains.'
+            : 'Failed to delete organizer group');
+        window.alert(message);
       },
     });
   }

@@ -1,0 +1,25 @@
+<div class="edit-profile-page">
+  <h2>Edit Profile</h2>
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="edit-form">
+    <label>
+      Email
+      <input type="email" formControlName="email_address" />
+    </label>
+
+    <label>
+      Display name
+      <input type="text" formControlName="display_name" />
+    </label>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="loading">Save</button>
+      <a routerLink="/profile/me">Cancel</a>
+      <button type="button" class="danger" (click)="deleteAccount()">Delete account</button>
+    </div>
+
+    <div *ngIf="loading" class="loading">Saving…</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="success" class="success">{{ success }}</div>
+  </form>
+</div>

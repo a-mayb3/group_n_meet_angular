@@ -30,6 +30,16 @@
     >
       {{ leaving ? 'Leaving...' : 'Leave Group' }}
     </button>
+
+    <button
+      *ngIf="!currentUserIsGroupMember"
+      type="button"
+      class="join-button"
+      (click)="joinGroup()"
+      [disabled]="joining"
+    >
+      {{ joining ? 'Joining...' : 'Add me to this group' }}
+    </button>
   </section>
 
   <app-events-list
