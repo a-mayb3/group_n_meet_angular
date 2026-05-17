@@ -18,7 +18,7 @@
           class="form-control"
           [class.is-invalid]="submitted && f['email_address'].errors"
           formControlName="email_address"
-          placeholder="Enter your email"
+          placeholder="user@example.com"
         />
         <div *ngIf="submitted && f['email_address'].errors" class="invalid-feedback">
           <span *ngIf="f['email_address'].errors['required']">Email is required</span>
@@ -35,7 +35,7 @@
           class="form-control"
           [class.is-invalid]="submitted && f['display_name'].errors"
           formControlName="display_name"
-          placeholder="Enter a display name"
+          placeholder="This will be how the world will see you."
         />
         <div *ngIf="submitted && f['display_name'].errors" class="invalid-feedback">
           <span *ngIf="f['display_name'].errors['required']">Display name is required</span>
@@ -51,7 +51,7 @@
           class="form-control"
           [class.is-invalid]="submitted && f['password'].errors"
           formControlName="password"
-          placeholder="Enter your password"
+          placeholder="Always choose a strong password."
         />
         <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
           <span *ngIf="f['password'].errors['required']">Password is required</span>

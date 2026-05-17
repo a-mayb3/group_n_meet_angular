@@ -11,14 +11,14 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <!-- Email Field -->
       <div class="form-group">
-        <label for="email" class="form-label">Email</label>
+        <label for="email" class="form-label">Email address</label>
         <input
           type="email"
           id="email"
           class="form-control"
           [class.is-invalid]="submitted && f['email'].errors"
           formControlName="email"
-          placeholder="Enter your email"
+          placeholder="user@example.com"
         />
         <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
           <span *ngIf="f['email'].errors['required']">Email is required</span>
@@ -35,7 +35,6 @@
           class="form-control"
           [class.is-invalid]="submitted && f['password'].errors"
           formControlName="password"
-          placeholder="Enter your password"
         />
         <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
           <span *ngIf="f['password'].errors['required']">Password is required</span>

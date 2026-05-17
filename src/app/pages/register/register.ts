@@ -16,7 +16,8 @@ export class RegisterComponent implements OnInit {
   loading = false;
   submitted = false;
   error = '';
-  returnUrl = '/search';
+  returnUrl = '/';
+  loginUrl = '/login';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -25,7 +26,7 @@ export class RegisterComponent implements OnInit {
     private authService: AuthService,
   ) {
     if (this.authService.isAuthenticated()) {
-      this.router.navigateByUrl('/search');
+      this.router.navigateByUrl(this.returnUrl);
     }
   }
 
@@ -36,7 +37,7 @@ export class RegisterComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
 
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/search';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
   get f() {
@@ -61,7 +62,7 @@ export class RegisterComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.router.navigateByUrl(this.returnUrl);
+          this.router.navigateByUrl(this.loginUrl);
         },
         error: (error) => {
           this.error = error?.error?.message || 'Registration failed';
