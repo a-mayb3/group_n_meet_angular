@@ -64,3 +64,9 @@ button {
   font-style: italic;
   font-size: .75rem;
 }
+
+.btn-danger {
+  background-color: var(--error-background-color);
+  color: var(--error-text-color);
+  cursor: pointer;
+}
