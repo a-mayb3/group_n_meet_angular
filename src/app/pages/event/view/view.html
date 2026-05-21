@@ -6,24 +6,24 @@
     <h1 class="event-title">
       {{ event.title ?? event.name ?? event.event_title }}
     </h1>
-    <div *ngIf="event.description" class="event-description">{{ event.description }}</div>
 
-    <div class="event-meta meta">
+    <div *ngIf="event.description" class="event-description">
+      {{ event.description }}
+    </div>
+
+    <section class="event-meta meta">
       <ul>
-      <li *ngIf="event.start_time">
-        Starts: {{ event.start_time | date: 'medium' }}
-      </li>
-      <li *ngIf="event.end_time">
-        Ends: {{ event.end_time | date: 'medium' }}
-      </li>
-      <li *ngIf="event.location"> Where: {{ event.location }} </li>
-      </ul>
-      <div
-        *ngIf="event && (event.organizer_group_name || event.organizer_group_id || event.group_id)"
-        class="organizer-section"
-      >
-        <p>
-          <strong>Organizer Group:</strong>
+        <li *ngIf="event.start_time">
+          Starts: {{ event.start_time | date: 'medium' }}
+        </li>
+        <li *ngIf="event.end_time">
+          Ends: {{ event.end_time | date: 'medium' }}
+        </li>
+        <li *ngIf="event.place">
+          Where: {{ event.place }}
+        </li>
+        <li *ngIf="(event.organizer_group_name || event.organizer_group_id || event.group_id)">
+          Organizer Group:
           <a class="organizer-link" (click)="navigateToOrganizerGroup()">
             {{
               event.organizer_group_name ||
@@ -32,9 +32,9 @@
                 'View organizer group'
             }}
           </a>
-        </p>
-      </div>
-    </div>
+        </li>
+      </ul>
+    </section>
   </article>
   <div class="event-actions">
     <button
