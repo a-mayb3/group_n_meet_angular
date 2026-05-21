@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
+import { generateDescriptionSuggestion } from '../../../utils/description';
+import { isoFromDateTimeLocal } from '../../../utils/search-params';
 
 @Component({
   selector: 'app-create-event',
@@ -14,8 +16,10 @@ import { ApiService } from '../../../services/api.service';
 export class CreateEventComponent implements OnInit {
   eventForm!: FormGroup;
   loading = false;
+  generatingDescription = false;
   submitted = false;
   error = '';
+  descriptionError = '';
   organizerGroups: any[] = [];
   loadingGroups = false;
 
@@ -74,6 +78,27 @@ export class CreateEventComponent implements OnInit {
     }
   }
 
+  generateDescription(): void {
+    if (this.generatingDescription || this.loading) return;
+
+    this.descriptionError = '';
+    this.generatingDescription = true;
+    generateDescriptionSuggestion(this.api, this.eventForm)
+      .pipe()
+      .subscribe({
+        next: (suggested) => {
+          this.generatingDescription = false;
+          this.eventForm.get('description')?.setValue(suggested);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.generatingDescription = false;
+          this.descriptionError = err?.error?.message || 'Failed to generate description';
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
   onSubmit(): void {
     this.submitted = true;
     this.error = '';
@@ -83,9 +108,9 @@ export class CreateEventComponent implements OnInit {
     const body: any = {
       name: this.f['name'].value,
       description: this.f['description'].value || undefined,
-      start_time: this.isoFromDateTimeLocal(this.f['start_time'].value) || undefined,
-      end_time: this.isoFromDateTimeLocal(this.f['end_time'].value) || undefined,
-      place: this.f['place'].value || undefined,
+      start_time: isoFromDateTimeLocal(this.f['start_time'].value) || undefined,
+      end_time: isoFromDateTimeLocal(this.f['end_time'].value) || undefined,
+      place: this.f['place'].value?.trim() || undefined,
       organizer_group_id: this.f['organizer_group_id'].value,
     };
 
@@ -110,14 +135,5 @@ export class CreateEventComponent implements OnInit {
     });
   }
 
-  private isoFromDateTimeLocal(value: string | null | undefined): string | null {
-    if (!value) return null;
-    try {
-      const d = new Date(value);
-      if (isNaN(d.getTime())) return null;
-      return d.toISOString();
-    } catch {
-      return null;
-    }
-  }
+  // Use shared helper from utils/search-params if needed for other conversions
 }

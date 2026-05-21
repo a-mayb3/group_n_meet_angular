@@ -1,9 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
+import { generateDescriptionSuggestion } from '../../../utils/description';
+import { isoFromDateTimeLocal } from '../../../utils/search-params';
 import { timeout } from 'rxjs/operators';
+import { from, of } from 'rxjs';
+import {
+  concatMap,
+  map,
+  catchError,
+  filter,
+  take,
+  defaultIfEmpty,
+  timeout as rxTimeout,
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-edit-event',
@@ -15,9 +27,11 @@ import { timeout } from 'rxjs/operators';
 export class EditEventComponent implements OnInit {
   eventForm!: FormGroup;
   loading = false;
+  generatingDescription = false;
   submitted = false;
   error = '';
   success = '';
+  descriptionError = '';
 
   event: any | null = null;
   eventId: string | null = null;
@@ -29,6 +43,7 @@ export class EditEventComponent implements OnInit {
     private api: ApiService,
     private router: Router,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -42,24 +57,18 @@ export class EditEventComponent implements OnInit {
       organizer_group_id: ['', [Validators.required]],
     });
 
-    const resolvedEvent = (this.route.snapshot.data as any)?.event ?? null;
-    const navEvent = (window.history.state as any)?.event ?? null;
-    this.event = resolvedEvent ?? navEvent ?? null;
-
     const id =
-      this.event?.id ?? this.event?.pk ?? this.event?._id ?? this.route.snapshot.paramMap.get('id');
+      (this.route.snapshot.data as any)?.event?.id ??
+      (this.route.snapshot.data as any)?.event?.pk ??
+      (this.route.snapshot.data as any)?.event?._id ??
+      (window.history.state as any)?.event?.id ??
+      (window.history.state as any)?.event?.pk ??
+      (window.history.state as any)?.event?._id ??
+      this.route.snapshot.paramMap.get('id');
     this.eventId = id ? String(id) : null;
 
-    if (this.event) {
-      this.eventForm.patchValue({
-        name: this.event.name ?? '',
-        description: this.event.description ?? '',
-        start_time: this.toDateTimeLocal(this.event.start_time ?? ''),
-        end_time: this.toDateTimeLocal(this.event.end_time ?? ''),
-        place: this.event.place ?? '',
-        organizer_group_id:
-          this.event.organizer_group_id ?? this.event.group_id ?? this.event.organizer?.id ?? '',
-      });
+    if (this.eventId) {
+      this.loadEvent(this.eventId);
     }
   }
 
@@ -83,9 +92,66 @@ export class EditEventComponent implements OnInit {
           } else if (Array.isArray(payload?.items)) {
             this.organizerGroups = payload.items;
           }
+          this.cdr.detectChanges();
         },
         error: () => {
           this.loadingGroups = false;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  private loadEvent(id: string): void {
+    this.loading = true;
+    this.error = '';
+
+    const endpoints = [`/events/${id}`, `/events/${id}/`, `/event/${id}`, `/event/${id}/`];
+
+    from(endpoints)
+      .pipe(
+        concatMap((endpoint) =>
+          this.api.get<any>(endpoint).pipe(
+            rxTimeout(10000),
+            map((resp) => (resp as any)?.data ?? resp),
+            catchError(() => of(null)),
+          ),
+        ),
+        filter((payload) => payload != null),
+        take(1),
+        defaultIfEmpty(null),
+      )
+      .subscribe({
+        next: (payload) => {
+          if (!payload) {
+            this.loading = false;
+            this.error = `Event ${id} not found`;
+            this.cdr.detectChanges();
+            return;
+          }
+
+          const eventObj = Array.isArray(payload) ? (payload[0] ?? null) : (payload ?? null);
+          this.event = eventObj;
+          this.eventForm.patchValue({
+            name: this.event?.name ?? '',
+            description: this.event?.description ?? '',
+            start_time: this.toDateTimeLocal(this.event?.start_time ?? ''),
+            end_time: this.toDateTimeLocal(this.event?.end_time ?? ''),
+            place: this.event?.place ?? '',
+            organizer_group_id:
+              this.event?.organizer_group_id ??
+              this.event?.group_id ??
+              this.event?.organizer?.id ??
+              '',
+          });
+          // Ensure template updates reflect patched form values (start/end inputs)
+          this.cdr.detectChanges();
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.loading = false;
+          this.error = `Event ${id} not found`;
+          this.cdr.detectChanges();
         },
       });
   }
@@ -98,6 +164,28 @@ export class EditEventComponent implements OnInit {
     }
   }
 
+  generateDescription(): void {
+    if (this.generatingDescription || this.loading) return;
+
+    this.descriptionError = '';
+    this.generatingDescription = true;
+
+    generateDescriptionSuggestion(this.api, this.eventForm)
+      .pipe(timeout(10000))
+      .subscribe({
+        next: (suggested) => {
+          this.generatingDescription = false;
+          this.eventForm.get('description')?.setValue(suggested);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.generatingDescription = false;
+          this.descriptionError = err?.error?.message || 'Failed to generate description';
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
   onSubmit(): void {
     this.submitted = true;
     this.error = '';
@@ -108,9 +196,9 @@ export class EditEventComponent implements OnInit {
     const body: any = {
       name: this.f['name'].value,
       description: this.f['description'].value || undefined,
-      start_time: this.isoFromDateTimeLocal(this.f['start_time'].value) || undefined,
-      end_time: this.isoFromDateTimeLocal(this.f['end_time'].value) || undefined,
-      place: this.f['place'].value || undefined,
+      start_time: isoFromDateTimeLocal(this.f['start_time'].value) || undefined,
+      end_time: isoFromDateTimeLocal(this.f['end_time'].value) || undefined,
+      place: this.f['place'].value?.trim() || undefined,
       organizer_group_id: this.f['organizer_group_id'].value,
     };
 
@@ -123,6 +211,7 @@ export class EditEventComponent implements OnInit {
           const payload = (resp as any)?.data ?? resp;
           const id = payload?.id ?? payload?.pk ?? payload?._id ?? this.eventId;
           this.success = 'Event updated successfully';
+          this.cdr.detectChanges();
           if (id) {
             this.router.navigate(['/event', String(id)]);
           } else {
@@ -132,6 +221,7 @@ export class EditEventComponent implements OnInit {
         error: (err) => {
           this.loading = false;
           this.error = err?.error?.message || 'Failed to update event';
+          this.cdr.detectChanges();
         },
       });
   }
@@ -149,18 +239,7 @@ export class EditEventComponent implements OnInit {
       return '';
     }
   }
-
-  private isoFromDateTimeLocal(value: string | null | undefined): string | null {
-    if (!value) return null;
-    try {
-      // value like 'YYYY-MM-DDTHH:mm' interpreted as local time
-      const d = new Date(value);
-      if (isNaN(d.getTime())) return null;
-      return d.toISOString();
-    } catch {
-      return null;
-    }
-  }
+  // ISO conversion uses shared helper from utils/search-params
 
   cancelEvent(): void {
     if (!this.eventId) return;
@@ -179,11 +258,13 @@ export class EditEventComponent implements OnInit {
           // After cancel, navigate back to event page or dashboard
           const payload = (resp as any)?.data ?? resp;
           const id = payload?.id ?? payload?.pk ?? payload?._id ?? this.eventId;
+          this.cdr.detectChanges();
           this.router.navigate(['/event', String(id)]);
         },
         error: (err) => {
           this.loading = false;
           this.error = err?.error?.message || 'Failed to cancel event';
+          this.cdr.detectChanges();
         },
       });
   }

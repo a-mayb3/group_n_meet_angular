@@ -19,6 +19,30 @@
   margin-bottom: 1rem;
 }
 
+.description-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.generate-description-button {
+  align-self: flex-start;
+  background: var(--primary-color);
+  color: white;
+  cursor: pointer;
+}
+
+.generate-description-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.description-error {
+  color: #b00020;
+  font-size: 0.875rem;
+}
+
 .invalid-feedback {
   color: #dc3545;
   font-size: 0.875rem;

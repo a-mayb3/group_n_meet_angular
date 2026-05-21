@@ -48,6 +48,17 @@
           class="form-control"
           formControlName="description"
         ></textarea>
+        <div class="description-actions">
+          <button
+            type="button"
+            class="generate-description-button"
+            [disabled]="generatingDescription || loading"
+            (click)="generateDescription()"
+          >
+            {{ generatingDescription ? 'Generating...' : 'Suggest description' }}
+          </button>
+          <div *ngIf="descriptionError" class="description-error">{{ descriptionError }}</div>
+        </div>
       </div>
 
       <div class="form-row">

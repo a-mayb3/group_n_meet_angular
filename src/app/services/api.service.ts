@@ -10,6 +10,19 @@ export interface ApiResponse<T = any> {
   success: boolean;
 }
 
+export interface EventDescriptionGenerateRequest {
+  existing_description: string;
+  event_name?: string;
+  start_time?: string;
+  end_time?: string;
+  place?: string;
+  organizer_group_id?: string;
+}
+
+export interface EventDescriptionGenerateResponse {
+  suggested_description: string;
+}
+
 /**
  * Explicit options shape that forces the 'body' observe overload on HttpClient
  */
@@ -70,6 +83,17 @@ export class ApiService {
   ): Observable<ApiResponse<T>> {
     const options: BodyOptions = { params, withCredentials: true, observe: 'body' };
     return this.http.patch<ApiResponse<T>>(`${environment.apiUrl}${endpoint}`, body, options);
+  }
+
+  generateEventDescription(
+    body: EventDescriptionGenerateRequest,
+  ): Observable<ApiResponse<EventDescriptionGenerateResponse>> {
+    const options: BodyOptions = { withCredentials: true, observe: 'body' };
+    return this.http.post<ApiResponse<EventDescriptionGenerateResponse>>(
+      `${environment.apiUrl}/events/generate-description`,
+      body,
+      options,
+    );
   }
 
   /**

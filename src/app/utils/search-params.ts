@@ -16,6 +16,18 @@ export function formatLocalDateTime(value?: string): string | undefined {
   return value;
 }
 
+export function isoFromDateTimeLocal(value?: string): string | undefined {
+  if (!value) return undefined;
+  try {
+    // Accepts 'YYYY-MM-DDTHH:mm' or full ISO; normalize to ISO
+    const d = new Date(value as string);
+    if (isNaN(d.getTime())) return undefined;
+    return d.toISOString();
+  } catch {
+    return undefined;
+  }
+}
+
 export function buildSearchParams(filters: SearchFilters): { [key: string]: string } {
   const params: { [key: string]: string } = {};
   if (filters.name) params['name'] = filters.name;
