@@ -1,21 +1,37 @@
 import { ApiService, EventDescriptionGenerateRequest } from '../services/api.service';
-import { FormGroup } from '@angular/forms';
 import { isoFromDateTimeLocal } from './search-params';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
+export interface EventDescriptionFormValues {
+  description?: string;
+  name?: string;
+  start_time?: string;
+  end_time?: string;
+  place?: string;
+  organizer_group_id?: string;
+}
+
+export function buildDescriptionRequest(
+  values: EventDescriptionFormValues,
+): EventDescriptionGenerateRequest {
+  const body: EventDescriptionGenerateRequest = {
+    existing_description: values.description || '',
+    event_name: values.name || undefined,
+    start_time: isoFromDateTimeLocal(values.start_time) || undefined,
+    end_time: isoFromDateTimeLocal(values.end_time) || undefined,
+    place: values.place || undefined,
+    organizer_group_id: values.organizer_group_id || undefined,
+  };
+
+  return body;
+}
+
 export function generateDescriptionSuggestion(
   api: ApiService,
-  form: FormGroup,
+  values: EventDescriptionFormValues,
 ): Observable<string> {
-  const body: EventDescriptionGenerateRequest = {
-    existing_description: form.get('description')?.value || '',
-    event_name: form.get('name')?.value || undefined,
-    start_time: isoFromDateTimeLocal(form.get('start_time')?.value) || undefined,
-    end_time: isoFromDateTimeLocal(form.get('end_time')?.value) || undefined,
-    place: form.get('place')?.value || undefined,
-    organizer_group_id: form.get('organizer_group_id')?.value || undefined,
-  };
+  const body = buildDescriptionRequest(values);
 
   return api
     .generateEventDescription(body)

@@ -1,15 +1,12 @@
 .edit-event-container {
   display: flex;
   justify-content: center;
-  padding: 2rem;
 }
 .edit-event-card {
   width: min(100%, 48rem);
   padding: 2rem;
 }
-.edit-title {
-  margin: 0 0 1.5rem;
-}
+
 .form-group {
   margin-bottom: 1rem;
 }
@@ -36,14 +33,7 @@
 .form-control {
   width: 100%;
 }
-.error {
-  color: #b00020;
-  margin-bottom: 1rem;
-}
-.success {
-  color: #0a7a2f;
-  margin-bottom: 1rem;
-}
+
 .back-link {
   margin-top: 1rem;
 }

@@ -83,7 +83,7 @@ export class CreateEventComponent implements OnInit {
 
     this.descriptionError = '';
     this.generatingDescription = true;
-    generateDescriptionSuggestion(this.api, this.eventForm)
+    generateDescriptionSuggestion(this.api, this.eventForm.getRawValue())
       .pipe()
       .subscribe({
         next: (suggested) => {

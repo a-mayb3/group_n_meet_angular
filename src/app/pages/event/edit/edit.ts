@@ -170,7 +170,7 @@ export class EditEventComponent implements OnInit {
     this.descriptionError = '';
     this.generatingDescription = true;
 
-    generateDescriptionSuggestion(this.api, this.eventForm)
+    generateDescriptionSuggestion(this.api, this.eventForm.getRawValue())
       .pipe(timeout(10000))
       .subscribe({
         next: (suggested) => {
