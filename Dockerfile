@@ -10,6 +10,10 @@ RUN npm run build -- --configuration production
 
 FROM nginx:alpine
 
+LABEL description="Frontend image for Group&Meet made with Angular."
+LABEL author="Borgia Leiva <edoardo.borgia.leiva@outlook.com>"
+LABEL version="0.1.dev1"
+
 COPY default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /tmp/dist
 
