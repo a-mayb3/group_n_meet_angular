@@ -45,8 +45,8 @@ export class CreateOrganizerGroupComponent implements OnInit {
       description: this.f['description'].value || undefined,
     };
 
-    this.api.post<any>('/org', body).subscribe({
-      next: (resp) => {
+    this.api.post<any>('/org/', body).subscribe({
+      next: (resp: any) => {
         this.loading = false;
         const payload = (resp as any)?.data ?? resp;
         const id = payload?.id ?? payload?.pk ?? payload?._id ?? null;
