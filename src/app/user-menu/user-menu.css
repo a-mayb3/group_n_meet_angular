@@ -26,7 +26,7 @@
 }
 
 .user-menu .menu-item:hover {
-  background: #f7f7f7;
+  background: #e4e9c4;
 }
 
 .logout-button {
@@ -34,6 +34,7 @@
   color: white;
 }
 
-.logout-button:hover {
+.logout-button:hover
+.logout-button:focus {
   background-color: #c82333;
 }

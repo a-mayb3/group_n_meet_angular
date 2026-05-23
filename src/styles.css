@@ -1,21 +1,39 @@
+@font-face {
+  font-family: 'C059';
+  src:
+    local('C059'),
+    url('/fonts/C059-Roman.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
+
   --border-color: #000f;
-  --background-color: #f9f9f9;
+  
+  --background-color: #f6f8d2;
   --error-background-color: #f8d7da;
+  
   --primary-color: #667eea;
   --primary-text-color: black;
+
+  --primary-button-color: #e4e9c4;
+
   --meta-text-color: #666;
   --not-found-text-color: #7c7c7c;
   --error-text-color: #721c24;
   --form-label-color: #333;
+
   --primary-font-family: 'C059', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
+ffffffbody {
   margin: 0;
   padding: 0;
 
@@ -95,6 +113,7 @@ button {
   padding: 0.4rem 0.6rem;
   border: 1px solid var(--border-color);
   border-radius: 0;
+  background-color: var(--primary-button-color);
 }
 
 .loading,
