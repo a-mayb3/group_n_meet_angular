@@ -26,6 +26,23 @@ nav {
   font-weight: 600;
   text-decoration: none;
   color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-logo {
+  height: 1.6rem;
+  width: auto;
+  display: block;
+}
+
+.brand-text {
+  margin-left: 0.4rem;
+  font-weight: 600;
+  color: inherit;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .navbar-search-form {
