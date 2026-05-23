@@ -1,6 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root{
+
+  /*
+   * Colors
+   */
+
   --border-color: #000f;
   --form-label-color: #333;
 
@@ -14,6 +19,16 @@
   --not-found-text-color: #7c7c7c;
   --error-text-color: #721c24;
 
+
+  /*
+   * Fonts
+   */
+
+  --primary-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+*{
+  box-sizing: border-box;
 }
 
 body {
@@ -22,6 +37,9 @@ body {
 
   color: var(--primary-text-color);
   background-color: var(--background-color);
+
+  box-sizing: border-box;
+  font-family: var(--primary-font-family);
 }
 
 textarea {
