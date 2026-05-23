@@ -1,13 +1,12 @@
 .member-card {
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  cursor: pointer;
+  --card-padding: 0.75rem;
 }
+
 .member-name {
   margin: 0 0 0.25rem 0;
   font-size: 1rem;
 }
 .member-meta {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--meta-text-color);
 }

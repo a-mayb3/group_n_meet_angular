@@ -1,1 +1,14 @@
-/* Styles inherited from global app.css */
+.create-org-container {
+  display: flex;
+  justify-content: center;
+}
+
+.create-org-card {
+  width: 100%;
+  max-width: 40%;
+  padding: 2rem;
+}
+
+.create-title {
+  margin-bottom: 1rem;
+}

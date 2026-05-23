@@ -1,9 +1,3 @@
-.rsvp-card {
-  padding: 1rem;
-  border: 1px solid black;
-  cursor: pointer;
-}
-
 .rsvp-title {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
@@ -11,7 +5,4 @@
 
 .rsvp-meta {
   font-size: 0.9rem;
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
 }

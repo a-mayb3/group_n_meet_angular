@@ -4,14 +4,6 @@
   align-items: center;
 }
 
-.username-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit;
-  padding: 0.25rem 0.5rem;
-}
-
 .user-menu {
   position: absolute;
   right: 0;
@@ -36,7 +28,6 @@
 .user-menu .menu-item:hover {
   background: #f7f7f7;
 }
-
 
 .logout-button {
   background-color: #dc3545;

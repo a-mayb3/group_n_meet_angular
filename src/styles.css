@@ -1,33 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
-
-:root{
-
-  /*
-   * Colors
-   */
-
+:root {
   --border-color: #000f;
-  --form-label-color: #333;
-
   --background-color: #f9f9f9;
   --error-background-color: #f8d7da;
-
   --primary-color: #667eea;
-  
   --primary-text-color: black;
   --meta-text-color: #666;
   --not-found-text-color: #7c7c7c;
   --error-text-color: #721c24;
-
-
-  /*
-   * Fonts
-   */
-
+  --form-label-color: #333;
   --primary-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-*{
+* {
   box-sizing: border-box;
 }
 
@@ -40,6 +24,58 @@ body {
 
   box-sizing: border-box;
   font-family: var(--primary-font-family);
+}
+
+article[class$='-card'] {
+  padding: var(--card-padding, 1rem);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+.form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.back-link {
+  margin-top: 1rem;
+}
+
+.event-meta,
+.org-meta,
+.rsvp-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.username-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0.25rem 0.5rem;
 }
 
 textarea {
@@ -71,7 +107,7 @@ button {
   font-style: italic;
 }
 
-.meta{
+.meta {
   color: var(--meta-text-color);
 
   list-style: none;
@@ -80,7 +116,7 @@ button {
 
   font-weight: light;
   font-style: italic;
-  font-size: .75rem;
+  font-size: 0.75rem;
 }
 
 .btn-danger {

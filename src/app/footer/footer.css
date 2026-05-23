@@ -1,16 +1,15 @@
 footer {
-
   align-self: center;
   justify-self: center;
 
   margin: 0;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
 
   min-height: 5rem;
   height: min-content;
 
   border: none;
-  border-top: 1px solid black;
+  border-top: 1px solid var(--border-color);
 
   display: flex;
   flex-direction: column;
@@ -30,5 +29,5 @@ footer {
 }
 
 .gpl {
-  font-size: .75rem;
+  font-size: 0.75rem;
 }
